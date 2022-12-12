@@ -3,7 +3,7 @@
 #include "Helpers.h"
 
 bool D3D11Manager::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hWnd, 
-	bool fullscreen, float screenDepth, float screenNear) {
+	bool fullscreen) {
 	bool ret;
 
 	// Store the vsync setting.
@@ -23,7 +23,7 @@ bool D3D11Manager::Initialize(int screenWidth, int screenHeight, bool vsync, HWN
 		return false;
 	}
 
-	SetViewportAndProjections(screenWidth, screenHeight, screenDepth, screenNear);
+	SetViewport(screenWidth, screenHeight);
 
 	return true;
 }
@@ -319,15 +319,12 @@ bool D3D11Manager::CreateDepthStencilAndRasterizerStates() {
 	return true;
 }
 
-void D3D11Manager::SetViewportAndProjections(int screenWidth, int screenHeight, 
-	float screenDepth, float screenNear) {
+void D3D11Manager::SetViewport(int screenWidth, int screenHeight) {
 	if (!m_DeviceContext) {
 		return;
 	}
 
 	D3D11_VIEWPORT viewport;
-	float fieldOfView;
-	float screenAspect;
 
 	viewport.Width = static_cast<float>(screenWidth);
 	viewport.Height = static_cast<float>(screenHeight);
@@ -338,15 +335,6 @@ void D3D11Manager::SetViewportAndProjections(int screenWidth, int screenHeight,
 
 	// TODO: separate rasterizer state from initialization
 	m_DeviceContext->RSSetViewports(1, &viewport);
-
-	fieldOfView = DirectX::XM_PIDIV4;
-	screenAspect = 1.0f * screenWidth / screenHeight;
-
-	m_ProjectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 
-		screenNear, screenDepth);
-
-	m_OrthoMatrix = DirectX::XMMatrixOrthographicLH(1.0f * screenWidth, 1.0f * screenHeight,
-		screenNear, screenDepth);
 }
 
 void D3D11Manager::Shutdown() {
@@ -388,14 +376,6 @@ ID3D11DeviceContext* D3D11Manager::GetDeviceContext() {
 	return m_DeviceContext;
 }
 
-DirectX::XMMATRIX& D3D11Manager::GetProjectionMatrix() {
-	return m_ProjectionMatrix;
-}
-
-DirectX::XMMATRIX& D3D11Manager::GetOrthoMatrix() {
-	return m_OrthoMatrix;
-}
-
 void D3D11Manager::GetVideoCardInfo(char* cardName, int& memory) {
 	strcpy_s(cardName, 128, m_VideoCardDescription);
 	memory = m_VideoCardMemory;
@@ -407,9 +387,10 @@ bool D3D11Manager::ResizeSwapChain(int screenWidth, int screenHeight) {
 
 		// Unbind all render targets
 		m_DeviceContext->OMSetRenderTargets(0, 0, 0);
-		// Release the reference to the render target view
+		// Release the reference to the views and buffers
 		m_RenderTargetView->Release();
 		m_DepthStencilView->Release();
+		m_DepthStencilBuffer->Release();
 
 		// Preserve the existing buffer count and format.
 		// Automatically choose the width and height to match the client rect for HWNDs.

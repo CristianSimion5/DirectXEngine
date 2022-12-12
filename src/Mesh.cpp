@@ -2,10 +2,10 @@
 
 #include "Helpers.h"
 
-Mesh::Mesh(std::vector<Vertex> verts, std::vector<unsigned int> inds, DirectX::XMMATRIX modelMatrix) {
+Mesh::Mesh(std::vector<Vertex> verts, std::vector<unsigned int> inds, Transform transform) {
     m_Vertices = verts;
     m_Indices = inds;
-    m_ModelMatrix = DirectX::XMMatrixIdentity(); //modelMatrix;
+    this->transform = transform;
 }
 
 bool Mesh::Initialize(ID3D11Device* device) {
@@ -23,16 +23,12 @@ void Mesh::Shutdown() {
     ShutdownBuffers();
 }
 
-void Mesh::Render(ID3D11DeviceContext* deviceContext) {
+void Mesh::Render(ID3D11DeviceContext* deviceContext) const {
     RenderBuffers(deviceContext);
 }
 
-int Mesh::GetIndexCount() {
+int Mesh::GetIndexCount() const {
     return static_cast<int>(m_Indices.size());
-}
-
-DirectX::XMMATRIX& Mesh::GetModelMatrix() {
-    return m_ModelMatrix;
 }
 
 bool Mesh::InitializeBuffers(ID3D11Device* device) {
@@ -128,7 +124,7 @@ void Mesh::ShutdownBuffers() {
     }
 }
 
-void Mesh::RenderBuffers(ID3D11DeviceContext* deviceContext) {
+void Mesh::RenderBuffers(ID3D11DeviceContext* deviceContext) const {
     unsigned int stride;
     unsigned int offset;
 

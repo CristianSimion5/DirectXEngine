@@ -12,7 +12,7 @@ bool GraphicsManager::Initialize(int screenWidth, int screenHeight, HWND hWnd) {
 	m_d3d = std::make_unique<D3D11Manager>();
 
 	result = m_d3d->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hWnd,
-		FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+		FULL_SCREEN);
 	if (!result) {
 		MessageBox(hWnd, TEXT("Could not initialize Direct3D 11."), TEXT("Error"), MB_OK);
 		return false;
@@ -22,8 +22,10 @@ bool GraphicsManager::Initialize(int screenWidth, int screenHeight, HWND hWnd) {
 	m_Mouse = std::make_unique<DirectX::Mouse>();
 	m_Mouse->SetWindow(hWnd);
 
-	m_Camera = std::make_unique<Camera>();
-	
+	std::unique_ptr<Camera> camera = std::make_unique<Camera>();
+	camera->GenerateProjectionMatrices(screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
+	m_MainCamera = camera.get();
+
 	model = std::make_unique<Model>();
 	result = model->Initialize(m_d3d->GetDevice(), "models/teapot2.obj");
 	if (!result) {
@@ -33,7 +35,7 @@ bool GraphicsManager::Initialize(int screenWidth, int screenHeight, HWND hWnd) {
 	m_Models.push_back(std::move(model));
 
 	model = std::make_unique<Model>();
-	result = model->Initialize(m_d3d->GetDevice(), "models/racing_car.obj", { 25.0f, 0.0f, -4.0f });
+	result = model->Initialize(m_d3d->GetDevice(), "models/racing_car.obj");
 	if (!result) {
 		MessageBox(hWnd, TEXT("Could not initialize the car model."), TEXT("Error"), MB_OK);
 		return false;
@@ -48,7 +50,23 @@ bool GraphicsManager::Initialize(int screenWidth, int screenHeight, HWND hWnd) {
 	}
 
 	// Change initial data here
-	m_Camera->SetPosition({ 0.0f, 0.0f, -5.0f });
+	m_MainCamera->transform.position = Vector3(0.0f, 0.0f, -5.0f);
+
+	m_SceneRoot = std::make_unique<SceneNode>();
+
+	std::unique_ptr<SceneNode> node1 = std::make_unique<SceneNode>(m_SceneRoot.get(), m_Models[0].get());
+	std::unique_ptr<SceneNode> node2 = std::make_unique<SceneNode>(node1.get(), m_Models[1].get());
+	node2->transform.position = Vector3(25.0f, 0.0f, -4.0f);
+	//node2->transform.UpdateGlobalMatrix();
+	std::unique_ptr<SceneNode> node3 = std::make_unique<SceneNode>(node2.get(), m_Models[0].get());
+	node3->transform.position = Vector3(30.0f, 0.0f, 0.0f);
+	node2->AddChild(std::move(node3));
+	node1->AddChild(std::move(node2));
+	m_SceneRoot->AddChild(std::move(node1));
+	
+	//camera->SetModel(m_Models[0].get());
+	m_SceneRoot->AddChild(std::move(camera));
+
 
 	return true;
 }
@@ -86,7 +104,8 @@ bool GraphicsManager::HandleResize(int screenWidth, int screenHeight) {
 	// https://learn.microsoft.com/en-us/windows/win32/direct3ddxgi/d3d10-graphics-programming-guide-dxgi#handling-window-resizing
 	if (m_d3d) {
 		m_d3d->ResizeSwapChain(screenWidth, screenHeight);
-		m_d3d->SetViewportAndProjections(screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
+		m_d3d->SetViewport(screenWidth, screenHeight);
+		m_MainCamera->GenerateProjectionMatrices(screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
 	}
 
 	return true;
@@ -97,18 +116,31 @@ bool GraphicsManager::Render(float deltaTime) {
 
 	m_d3d->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
-	m_Camera->Render(deltaTime);
+	//m_MainCamera->Render(deltaTime);
+	m_MainCamera->GenerateViewMatrix();
+	m_MainCamera->UpdateTransform();
 
-	m_Models[1]->Translate({-25.0f, 0.0f,  4.0f });
-	m_Models[1]->Rotate({ 0.0f, 1.0f, 0.0f }, 15.0f * deltaTime);
-	m_Models[1]->Translate({ 25.0f, 0.0f, -4.0f });
+	//m_Models[1]->transform.position += Vector3(-25.0f, 0.0f, 4.0f);
+	m_SceneRoot->children[0]->children[0]->children[0]->transform.rotation += Vector3::Up * DirectX::XMConvertToRadians(30.0f) * deltaTime;
+	//m_SceneRoot->children[0]->children[0]->children[0]->UpdateTransform();
+	m_SceneRoot->children[0]->children[0]->transform.rotation += Vector3::Up * DirectX::XMConvertToRadians(15.0f) * deltaTime;
+	//m_SceneRoot->children[0]->children[0]->UpdateTransform();
+	//m_Models[1]->transform.position += Vector3(25.0f, 0.0f, -4.0f);
+	m_SceneRoot->children[0]->transform.rotation += Vector3::Up * DirectX::XMConvertToRadians(15.0f) * deltaTime;
+	m_SceneRoot->children[0]->transform.scale = Vector3::One * 0.1f;
+	m_SceneRoot->children[0]->UpdateTransform();
 
-	for (auto& model : m_Models) {
-		result = model->Render(m_d3d->GetDeviceContext(), m_Shader.get(),
-			m_Camera->GetViewMatrix(), m_d3d->GetProjectionMatrix());
+	/*for (auto& object : m_Objects) {
+		result = object->Render(m_d3d->GetDeviceContext(), m_Shader.get(),
+			m_MainCamera->GetViewMatrix(), m_d3d->GetProjectionMatrix());
 		if (!result) {
 			return false;
 		}
+	}*/
+	result = m_SceneRoot->Render(m_d3d->GetDeviceContext(), m_Shader.get(),
+		m_MainCamera->GetViewMatrix(), m_MainCamera->GetProjectionMatrix());
+	if (!result) {
+		return false;
 	}
 
 	m_d3d->EndScene();
@@ -121,11 +153,11 @@ void GraphicsManager::ProcessInput(float deltaTime) {
 	auto kb = m_Keyboard->GetState();
 
 	if (kb.Home) {
-		m_Camera->SetPosition({ 0.0f, 0.0f, -5.0f });
-		m_Camera->SetPitchYaw(0.0f, 0.0f);
+		m_MainCamera->transform.position = Vector3::Backward * -0.5f;
+		m_MainCamera->transform.rotation = Vector3::Zero;
 	}
 
-	DirectX::XMFLOAT3 move = { 0.0f, 0.0f, 0.0f };
+	Vector3 move = Vector3::Zero;
 		
 	cameraDelta = CAMERA_SPEED * deltaTime;
 	if (kb.W) {
@@ -147,20 +179,17 @@ void GraphicsManager::ProcessInput(float deltaTime) {
 		move.y -= cameraDelta;
 	}
 
-	auto q = DirectX::XMQuaternionRotationRollPitchYaw(m_Camera->GetPitch(), m_Camera->GetYaw(), 0.0f);
-	
-	auto moveVec = DirectX::XMVector3Rotate(DirectX::XMLoadFloat3(&move), q);
+	move = Vector3::Transform(move, Matrix::CreateFromYawPitchRoll(m_MainCamera->transform.rotation));
 
-	DirectX::XMStoreFloat3(&move, moveVec);
-	m_Camera->Move(move);
+	m_MainCamera->transform.position += move;
 
 	auto mouse = m_Mouse->GetState();
 
 	cameraDelta = LOOK_SPEED * deltaTime;
 	if (mouse.positionMode == DirectX::Mouse::MODE_RELATIVE) {
-		DirectX::XMFLOAT3 delta = { 1.0f * mouse.x, 1.0f * mouse.y, 0.0f };
-		m_Camera->UpdatePitch(delta.y * cameraDelta);
-		m_Camera->UpdateYaw(delta.x * cameraDelta);
+		Vector3 delta = Vector3(1.0f * mouse.x, 1.0f * mouse.y, 0.0f);
+		m_MainCamera->transform.rotation.x += delta.y * cameraDelta;
+		m_MainCamera->transform.rotation.y += delta.x * cameraDelta;
 	}
 
 	m_Mouse->SetMode(mouse.rightButton ? DirectX::Mouse::MODE_RELATIVE : DirectX::Mouse::MODE_ABSOLUTE);

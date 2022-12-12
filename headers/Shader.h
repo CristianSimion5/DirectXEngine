@@ -3,15 +3,17 @@
 
 #include <d3d11.h>
 #include <d3dcompiler.h>
-#include <DirectXMath.h>
+#include <SimpleMath.h>
+
+using namespace DirectX::SimpleMath;
 
 class Shader {
 private:
 	struct MatrixBufferType
 	{
-		DirectX::XMMATRIX world;
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX projection;
+		Matrix world;
+		Matrix view;
+		Matrix projection;
 	};
 
 public:

@@ -13,7 +13,7 @@
 
 class D3D11Manager {
 public:
-    bool Initialize(int, int, bool, HWND, bool, float, float);
+    bool Initialize(int, int, bool, HWND, bool);
     void Shutdown();
 
     void BeginScene(float, float, float, float);
@@ -22,13 +22,10 @@ public:
     ID3D11Device* GetDevice();
     ID3D11DeviceContext* GetDeviceContext();
 
-    DirectX::XMMATRIX& GetProjectionMatrix();
-    DirectX::XMMATRIX& GetOrthoMatrix();
-
     void GetVideoCardInfo(char*, int&);
 
     bool ResizeSwapChain(int, int);
-    void SetViewportAndProjections(int, int, float, float);
+    void SetViewport(int, int);
 
 private:
     bool InitializeDXGI(int, int, HWND, bool);
@@ -49,8 +46,6 @@ private:
     ID3D11DepthStencilState* m_DepthStencilState;
     ID3D11DepthStencilView* m_DepthStencilView;
     ID3D11RasterizerState* m_RasterizerState;
-    DirectX::XMMATRIX m_ProjectionMatrix;
-    DirectX::XMMATRIX m_OrthoMatrix;
 };
 
 #endif // !_D3D11_MANAGER_H_

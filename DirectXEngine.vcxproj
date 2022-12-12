@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\SceneNode.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\D3D11Manager.cpp" />
     <ClCompile Include="src\GraphicsManager.cpp" />
@@ -27,6 +28,7 @@
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\WindowsClass.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -36,7 +38,9 @@
     <ClInclude Include="headers\Helpers.h" />
     <ClInclude Include="headers\Mesh.h" />
     <ClInclude Include="headers\Model.hpp" />
+    <ClInclude Include="headers\SceneNode.h" />
     <ClInclude Include="headers\Shader.h" />
+    <ClInclude Include="headers\Transform.h" />
     <ClInclude Include="headers\WindowsClass.h" />
     <ClInclude Include="headers\InputManager.h" />
   </ItemGroup>

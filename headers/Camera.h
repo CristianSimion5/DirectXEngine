@@ -1,35 +1,25 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
-#include <DirectXMath.h>
+#include <SimpleMath.h>
 
-class Camera {
+#include "SceneNode.h"
+
+class Camera : public SceneNode {
 public:
-    Camera();
+    Camera(const SceneNode* = nullptr, const Model* = nullptr);
 
-    void SetPosition(DirectX::XMFLOAT3);
-    //void SetRotation(DirectX::XMFLOAT3);
-    void SetPitchYaw(float, float);
-    
-    void Move(DirectX::XMFLOAT3);
-    void UpdatePitch(float);
-    void UpdateYaw(float);
+    void GenerateViewMatrix();
+    void GenerateProjectionMatrices(int, int, float, float);
 
-    DirectX::XMFLOAT3 GetPosition();
-    //DirectX::XMFLOAT3 GetRotation();
-    float GetPitch();
-    float GetYaw();
-
-    DirectX::XMMATRIX& GetViewMatrix();
-    void Render(float);
+    const Matrix& GetViewMatrix();
+    const Matrix& GetProjectionMatrix();
+    const Matrix& GetOrthoMatrix();
 
 private:
-    DirectX::XMFLOAT3 m_Position;
-    //DirectX::XMFLOAT3 m_Rotation;
-    DirectX::XMMATRIX m_ViewMatrix;
-
-    float m_Pitch;
-    float m_Yaw;
+    Matrix m_ViewMatrix;
+    Matrix m_ProjectionMatrix;
+    Matrix m_OrthoMatrix;
 };
 
 #endif // !_CAMERA_H_

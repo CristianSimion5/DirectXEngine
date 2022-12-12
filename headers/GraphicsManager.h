@@ -12,6 +12,7 @@
 #include "D3D11Manager.h"
 #include "Shader.h"
 #include "Model.hpp"
+#include "SceneNode.h"
 #include "Camera.h"
 
 // Globals
@@ -23,7 +24,7 @@ const float SCREEN_NEAR = 0.1f;
 class GraphicsManager {
 public:
     GraphicsManager() = default;
-    GraphicsManager(const GraphicsManager&) = default;
+    GraphicsManager(const GraphicsManager&) = delete;
     ~GraphicsManager() = default;
 
     bool Initialize(int, int, HWND);
@@ -40,8 +41,9 @@ private:
     const float LOOK_SPEED = 1.5f;
 
     std::unique_ptr<D3D11Manager> m_d3d;
-    std::unique_ptr<Camera> m_Camera;
+    Camera* m_MainCamera;
     std::vector<std::unique_ptr<Model>> m_Models;
+    std::unique_ptr<SceneNode> m_SceneRoot;
     std::unique_ptr<Shader> m_Shader;
 
     std::unique_ptr<DirectX::Keyboard> m_Keyboard;

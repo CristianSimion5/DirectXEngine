@@ -29,7 +29,7 @@ PixelInputType VertexShaderMain(VertexInputType input)
     output.position = mul(mvp, input.position);
 
     //output.color = input.color;
-    output.color = float4(mul((float3x3) worldMatrix, input.normal) * 0.5f + 0.5f, 1.0f);
+    output.color = float4(normalize(mul((float3x3) worldMatrix, input.normal)) * 0.5f + 0.5f, 1.0f);
     
     return output;
 }
