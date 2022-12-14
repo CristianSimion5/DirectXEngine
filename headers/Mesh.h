@@ -2,15 +2,14 @@
 #define _MESH_H_
 
 #include <d3d11.h>
-#include <Transform.h>
+#include "Transform.h"
 
 #include <vector>
 
-#include <Shader.h>
+#include "Shader.h"
 
 struct Vertex {
     Vector3 Position;
-    //DirectX::XMFLOAT4 Color;
     Vector3 Normal;
     Vector2 UV;
 };
@@ -21,14 +20,13 @@ public:
 
     bool Initialize(ID3D11Device*);
     void Shutdown();
-    void Render(ID3D11DeviceContext*) const;
+    void BindBuffers(ID3D11DeviceContext*) const;
 
     int GetIndexCount() const;
 
 private:
     bool InitializeBuffers(ID3D11Device*);
     void ShutdownBuffers();
-    void RenderBuffers(ID3D11DeviceContext*) const;
 
 public:
     Transform transform;

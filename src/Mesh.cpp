@@ -23,10 +23,6 @@ void Mesh::Shutdown() {
     ShutdownBuffers();
 }
 
-void Mesh::Render(ID3D11DeviceContext* deviceContext) const {
-    RenderBuffers(deviceContext);
-}
-
 int Mesh::GetIndexCount() const {
     return static_cast<int>(m_Indices.size());
 }
@@ -124,7 +120,7 @@ void Mesh::ShutdownBuffers() {
     }
 }
 
-void Mesh::RenderBuffers(ID3D11DeviceContext* deviceContext) const {
+void Mesh::BindBuffers(ID3D11DeviceContext* deviceContext) const {
     unsigned int stride;
     unsigned int offset;
 

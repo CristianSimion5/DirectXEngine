@@ -9,12 +9,16 @@
 #include <assimp/postprocess.h>
 
 #include "Mesh.h"
+#include "Material.h"
 
 class Model {
 public:
     bool Initialize(ID3D11Device*, const char*);
+    bool Initialize(ID3D11Device*, const char*, Material*);
     void Shutdown();
-    bool Render(ID3D11DeviceContext*, Shader*, Matrix, Matrix, Matrix) const;
+
+    bool Render(ID3D11DeviceContext*, ShaderPayload*, Matrix) const;
+    void SetMaterial(Material*);
 
 private:
     bool ImportModel(const char*);
@@ -23,6 +27,7 @@ private:
 
 private:
     std::vector<Mesh> m_Meshes;
+    Material* m_Material;
 };
 
 #endif // !_MODEL_H_

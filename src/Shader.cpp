@@ -4,18 +4,10 @@
 
 #include <fstream>
 
-bool Shader::Initialize(ID3D11Device* device, HWND hWnd) {
+bool Shader::Initialize(ID3D11Device* device, HWND hWnd, const std::wstring& vsPath, const std::wstring& psPath) {
     bool result;
-    LPCWSTR vsCompiledObjPath;
-    LPCWSTR psCompiledObjPath;
-
-#if _DEBUG
-    vsCompiledObjPath = L"bin/Debug/VertexShader.cso";
-    psCompiledObjPath = L"bin/Debug/PixelShader.cso";
-#else
-    vsCompiledObjPath = L"bin/Release/VertexShader.cso";
-    psCompiledObjPath = L"bin/Release/PixelShader.cso";
-#endif
+    LPCWSTR vsCompiledObjPath = vsPath.c_str();
+    LPCWSTR psCompiledObjPath = psPath.c_str();
 
     result = InitializeShader(device, hWnd, vsCompiledObjPath, psCompiledObjPath);
     if (!result) {
@@ -29,27 +21,11 @@ void Shader::Shutdown() {
     ShutdownShader();
 }
 
-bool Shader::Render(ID3D11DeviceContext* deviceContext, int indexCount, MatrixBufferType matrices) {
-    bool result;
-
-    result = SetShaderParameters(deviceContext, matrices);
-    if (!result) {
-        return false;
-    }
-
-    RenderShader(deviceContext, indexCount);
-
-    return true;
-}
-
 bool Shader::InitializeShader(ID3D11Device* device, HWND hWnd, LPCWSTR vsPath, LPCWSTR psPath) {
     HRESULT result;
     ID3DBlob* errorBlob;
     ID3DBlob* vsBlob;
     ID3DBlob* psBlob;
-    D3D11_INPUT_ELEMENT_DESC polygonLayout[3];
-    unsigned int numElements;
-    D3D11_BUFFER_DESC matrixBufferDesc;
 
     errorBlob = nullptr;
     vsBlob = nullptr;
@@ -58,8 +34,8 @@ bool Shader::InitializeShader(ID3D11Device* device, HWND hWnd, LPCWSTR vsPath, L
     // Read precompiled objects
     result = D3DReadFileToBlob(vsPath, &vsBlob);
     if (FAILED(result)) {
-        MessageBox(nullptr, 
-            TEXT("Failed to read vertex shader precompiled object to blob."), TEXT("Error"), MB_OK); 
+        MessageBox(nullptr,
+            TEXT("Failed to read vertex shader precompiled object to blob."), TEXT("Error"), MB_OK);
         return false;
     }
 
@@ -83,15 +59,9 @@ bool Shader::InitializeShader(ID3D11Device* device, HWND hWnd, LPCWSTR vsPath, L
         return false;
     }
 
-    // Create Input Layout
-    polygonLayout[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-    polygonLayout[1] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-    polygonLayout[2] = { "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-    //polygonLayout[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+    auto polygonLayout = GenerateInputLayout();
 
-    numElements = _countof(polygonLayout);
-
-    result = device->CreateInputLayout(polygonLayout, numElements,
+    result = device->CreateInputLayout(polygonLayout.data(), polygonLayout.size(),
         vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &m_Layout);
     if (FAILED(result)) {
         return false;
@@ -100,16 +70,8 @@ bool Shader::InitializeShader(ID3D11Device* device, HWND hWnd, LPCWSTR vsPath, L
     SafeRelease(vsBlob);
     SafeRelease(psBlob);
 
-    // Create matrices constant buffer
-    matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-    matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
-    matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    matrixBufferDesc.MiscFlags = 0;
-    matrixBufferDesc.StructureByteStride = 0;
-
-    result = device->CreateBuffer(&matrixBufferDesc, nullptr, &m_MatrixBuffer);
-    if (FAILED(result)) {
+    bool ret = CreateConstantBuffers(device);
+    if (!ret) {
         return false;
     }
 
@@ -117,9 +79,7 @@ bool Shader::InitializeShader(ID3D11Device* device, HWND hWnd, LPCWSTR vsPath, L
 }
 
 void Shader::ShutdownShader() {
-    if (m_MatrixBuffer) {
-        SafeRelease(m_MatrixBuffer);
-    }
+    ShutdownConstantBuffers();
 
     if (m_Layout) {
         SafeRelease(m_Layout);
@@ -152,7 +112,16 @@ void Shader::OutputShaderErrorMessage(ID3DBlob* errorBlob, HWND hWnd, LPCWSTR sh
         TEXT("Failed to compile shader. Error message sent to shader_error.txt."), shaderFilename, MB_OK);
 }
 
-bool Shader::SetShaderParameters(ID3D11DeviceContext* deviceContext, MatrixBufferType matrices) {
+void Shader::SetShader(ID3D11DeviceContext* deviceContext) {
+    deviceContext->IASetInputLayout(m_Layout);
+
+    deviceContext->VSSetShader(m_VertexShader, nullptr, 0);
+    deviceContext->PSSetShader(m_PixelShader, nullptr, 0);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool SimpleShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, ShaderPayload* payload) {
     HRESULT result;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     MatrixBufferType* dataPtr;
@@ -166,9 +135,9 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext* deviceContext, MatrixBuffe
 
     dataPtr = static_cast<MatrixBufferType*>(mappedResource.pData);
 
-    dataPtr->world = matrices.world;
-    dataPtr->view = matrices.view;
-    dataPtr->projection = matrices.projection;
+    dataPtr->world = payload->matrices.world;
+    dataPtr->view = payload->matrices.view;
+    dataPtr->projection = payload->matrices.projection;
 
     deviceContext->Unmap(m_MatrixBuffer, 0);
 
@@ -179,11 +148,133 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext* deviceContext, MatrixBuffe
     return true;
 }
 
-void Shader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount) {
-    deviceContext->IASetInputLayout(m_Layout);
+std::vector<D3D11_INPUT_ELEMENT_DESC> SimpleShader::GenerateInputLayout() {
+    std::vector<D3D11_INPUT_ELEMENT_DESC> polygonLayout(3);
 
-    deviceContext->VSSetShader(m_VertexShader, nullptr, 0);
-    deviceContext->PSSetShader(m_PixelShader, nullptr, 0);
+    // Create Input Layout
+    polygonLayout[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+    polygonLayout[1] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+    polygonLayout[2] = { "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 
-    deviceContext->DrawIndexed(indexCount, 0, 0);
+    return polygonLayout;
+}
+
+bool SimpleShader::CreateConstantBuffers(ID3D11Device* device) {
+    HRESULT result;
+    D3D11_BUFFER_DESC matrixBufferDesc;
+
+    // Create matrices constant buffer
+    matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+    matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
+    matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    matrixBufferDesc.MiscFlags = 0;
+    matrixBufferDesc.StructureByteStride = 0;
+
+    result = device->CreateBuffer(&matrixBufferDesc, nullptr, &m_MatrixBuffer);
+    if (FAILED(result)) {
+        return false;
+    }
+
+    return true;
+}
+
+void SimpleShader::ShutdownConstantBuffers() {
+    if (m_MatrixBuffer) {
+        SafeRelease(m_MatrixBuffer);
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool PhongShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, ShaderPayload* payload) {
+    HRESULT result;
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    LightingMatrices* dataPtr;
+    LightProperties* dataPtr2;
+
+    result = deviceContext->Map(m_PerObjectConstantBuffer, 0,
+        D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    if (FAILED(result)) {
+        return false;
+    }
+
+    dataPtr = static_cast<LightingMatrices*>(mappedResource.pData);
+
+    dataPtr->worldMatrix                 = payload->lightMatrices.worldMatrix;
+    dataPtr->inverseTransposeWorldMatrix = payload->lightMatrices.inverseTransposeWorldMatrix;
+    dataPtr->worldViewProjectionMatrix   = payload->lightMatrices.worldViewProjectionMatrix;
+
+    deviceContext->Unmap(m_PerObjectConstantBuffer, 0);
+
+    // TODO: Separate Vertex Shader stage from initialization
+    deviceContext->VSSetConstantBuffers(0, 1, &m_PerObjectConstantBuffer);
+
+    result = deviceContext->Map(m_LightPropertiesConstantBuffer, 0,
+        D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    if (FAILED(result)) {
+        return false;
+    }
+
+    dataPtr2 = static_cast<LightProperties*>(mappedResource.pData);
+
+    dataPtr2->eyePosition   = payload->lightProperties.eyePosition;
+    dataPtr2->globalAmbient = payload->lightProperties.globalAmbient;
+    for (int i = 0; i < 8; i++) {
+        dataPtr2->lights[i] = payload->lightProperties.lights[i];
+    }
+    dataPtr2->specularType  = payload->lightProperties.specularType;
+
+    deviceContext->Unmap(m_LightPropertiesConstantBuffer, 0);
+
+    // StartSlot is 1 (check shader register)
+    deviceContext->PSSetConstantBuffers(1, 1, &m_LightPropertiesConstantBuffer);
+
+    return true;
+}
+
+std::vector<D3D11_INPUT_ELEMENT_DESC> PhongShader::GenerateInputLayout() {
+    std::vector<D3D11_INPUT_ELEMENT_DESC> polygonLayout(3);
+
+    // Create Input Layout
+    polygonLayout[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+    polygonLayout[1] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+    polygonLayout[2] = { "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+
+    return polygonLayout;
+}
+
+bool PhongShader::CreateConstantBuffers(ID3D11Device* device) {
+    HRESULT result;
+    D3D11_BUFFER_DESC constantBufferDesc;
+    ZeroMemory(&constantBufferDesc, sizeof(D3D11_BUFFER_DESC));
+
+    // Create matrices constant buffer
+    constantBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+    constantBufferDesc.ByteWidth = sizeof(LightProperties);
+    constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    constantBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    
+    result = device->CreateBuffer(&constantBufferDesc, nullptr, &m_LightPropertiesConstantBuffer);
+    if (FAILED(result)) {
+        return false;
+    }
+
+    constantBufferDesc.ByteWidth = sizeof(LightingMatrices);
+    result = device->CreateBuffer(&constantBufferDesc, nullptr, &m_PerObjectConstantBuffer);
+    if (FAILED(result)) {
+        return false;
+    }
+
+    return true;
+}
+
+void PhongShader::ShutdownConstantBuffers() {
+    if (m_PerObjectConstantBuffer) {
+        SafeRelease(m_PerObjectConstantBuffer);
+    }
+
+    if (m_LightPropertiesConstantBuffer) {
+        SafeRelease(m_LightPropertiesConstantBuffer);
+    }
 }

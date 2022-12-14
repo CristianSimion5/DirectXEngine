@@ -5,18 +5,17 @@ SceneNode::SceneNode(const SceneNode* parent, const Model* model) {
     m_Model = model;
 }
 
-bool SceneNode::Render(ID3D11DeviceContext* deviceContext, Shader* shader, 
-    const Matrix& viewMatrix, const Matrix& projectionMatrix) {
+bool SceneNode::Render(ID3D11DeviceContext* deviceContext, ShaderPayload* shaderPayload) {
     bool renderSuccess;
     if (m_Model) {
-        renderSuccess = m_Model->Render(deviceContext, shader, transform.globalMatrix, viewMatrix, projectionMatrix);
+        renderSuccess = m_Model->Render(deviceContext, shaderPayload, transform.globalMatrix);
         if (!renderSuccess) {
             return false;
         }
     }
 
     for (auto& child : children) {
-        child->Render(deviceContext, shader, viewMatrix, projectionMatrix);
+        child->Render(deviceContext, shaderPayload);
     }
 
     return true;

@@ -14,7 +14,7 @@ class SceneNode {
 public:
     SceneNode(const SceneNode* parent = nullptr, const Model* model = nullptr);
     //virtual ~SceneNode() = default;
-    bool Render(ID3D11DeviceContext*, Shader*, const Matrix&, const Matrix&);
+    bool Render(ID3D11DeviceContext*, ShaderPayload*);
     void UpdateTransform();
     void AddChild(std::unique_ptr<SceneNode>&& child);
 

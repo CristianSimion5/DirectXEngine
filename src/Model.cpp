@@ -17,27 +17,61 @@ bool Model::Initialize(ID3D11Device* device, const char* modelPath) {
     return true;
 }
 
+bool Model::Initialize(ID3D11Device* device, const char* modelPath, Material* material) {
+    bool result = Initialize(device, modelPath);
+    if (!result) {
+        return false;
+    }
+
+    m_Material = material;
+
+    return true;
+}
+
 void Model::Shutdown() {
     for (Mesh& mesh : m_Meshes) {
         mesh.Shutdown();
     }
 }
 
-bool Model::Render(ID3D11DeviceContext* deviceContext, Shader* shader, 
-    Matrix worldMatrix, Matrix viewMatrix, Matrix projectionMatrix) const {
-    bool renderSuccess = true;
-    for (const Mesh& mesh : m_Meshes) {
-        mesh.Render(deviceContext);
+bool Model::Render(ID3D11DeviceContext* deviceContext, ShaderPayload* shaderPayload, Matrix worldMatrix) const {
+    if (!m_Material) {
+        return true;
+    }
 
-        renderSuccess = shader->Render(deviceContext, mesh.GetIndexCount(),
+    bool renderSuccess = true;
+    // Add per material constant buffer data
+    m_Material->SetShader(deviceContext);
+    renderSuccess = m_Material->SetShaderMaterialParameters(deviceContext, shaderPayload);
+    if (!renderSuccess) {
+        return false;
+    }
+
+    for (const Mesh& mesh : m_Meshes) {
+        // Add per mesh constant buffer data
+        shaderPayload->matrices.world = mesh.transform.globalMatrix * worldMatrix;
+        shaderPayload->lightMatrices.worldMatrix = mesh.transform.globalMatrix * worldMatrix;
+        shaderPayload->lightMatrices.worldViewProjectionMatrix = shaderPayload->lightMatrices.worldMatrix 
+           * shaderPayload->viewProjectionMatrix;
+        shaderPayload->lightMatrices.inverseTransposeWorldMatrix =
+            shaderPayload->lightMatrices.worldMatrix.Invert().Transpose();
+
+        mesh.BindBuffers(deviceContext);
+        renderSuccess = m_Material->SetShaderPerMeshData(deviceContext, shaderPayload);
             //{ m_ModelMatrix * mesh.GetModelMatrix(), viewMatrix, projectionMatrix});
-            { mesh.transform.globalMatrix * worldMatrix, viewMatrix, projectionMatrix});
+            //{ mesh.transform.globalMatrix * worldMatrix, viewMatrix, projectionMatrix});
         if (!renderSuccess) {
             return false;
         }
+
+        deviceContext->DrawIndexed(mesh.GetIndexCount(), 0, 0);
     }
 
     return true;
+}
+
+void Model::SetMaterial(Material* material) {
+    m_Material = material;
 }
 
 bool Model::ImportModel(const char* modelPath) {

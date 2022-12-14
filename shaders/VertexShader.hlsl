@@ -1,4 +1,4 @@
-cbuffer MatrixBuffer 
+cbuffer MatrixBuffer : register(b0)
 {
     matrix worldMatrix;
     matrix viewMatrix;
@@ -8,9 +8,8 @@ cbuffer MatrixBuffer
 struct VertexInputType
 {
     float4 position : POSITION;
-    //float4 color : COLOR;
-    float3 normal : NORMAL;
-    float2 texcoord : UV;
+    float3 normal   : NORMAL;
+    float2 texCoord : UV;
 };
 
 struct PixelInputType
