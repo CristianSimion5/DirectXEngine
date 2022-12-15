@@ -16,7 +16,7 @@ bool Scene::Initialize(int screenWidth, int screenHeight, HWND hWnd) {
 	m_ScreenWidth = screenWidth;
 	m_ScreenHeight = screenHeight;
 	Deserializer deser;
-	deser.DeserializeScene(this, "scene3.json");
+	deser.DeserializeScene(this, "scenes/scene3.json");
 	m_MainCamera->GenerateProjectionMatrices(screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
 
 	/*if (!InitializeShaders()) {
@@ -187,7 +187,7 @@ void Scene::InitializeScene(int screenWidth, int screenHeight) {
 
 void Scene::Shutdown() {
 	/*Serializer ser;
-	ser.SerializeScene(this, "scene3.json");*/
+	ser.SerializeScene(this, "scenes/scene3.json");*/
 
 	for (auto& shader : m_Shaders) {
 		if (shader.second) {
