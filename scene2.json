@@ -1,0 +1,361 @@
+{
+    "name": "Sample scene",
+    "main_camera": "main camera",
+    "shaders": [
+        {
+            "name": "Normal To Color",
+            "vs_path": "bin/shaders/VertexShader.cso",
+            "ps_path": "bin/shaders/PixelShader.cso",
+            "type": "normal-to-color"
+        },
+        {
+            "name": "Phong Lighting",
+            "vs_path": "bin/shaders/PhongVertexShader.cso",
+            "ps_path": "bin/shaders/PhongPixelShader.cso",
+            "type": "phong-lighting"
+        }
+    ],
+    "textures": [
+        {
+            "name": "Emerald",
+            "path": "textures/emerald_texture.jpg"
+        },
+        {
+            "name": "Thread",
+            "path": "textures/thread_texture.jpg"
+        }
+    ],
+    "materials": [
+        {
+            "name": "Emerald Plastic",
+            "shader": "Phong Lighting",
+            "textures": [
+                "Emerald"
+            ],
+            "properties": {
+                "emissive": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ambient": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "diffuse": [
+                    0.10000000149011612,
+                    0.3499999940395355,
+                    0.10000000149011612,
+                    1.0
+                ],
+                "specular": [
+                    0.44999998807907104,
+                    0.550000011920929,
+                    0.44999998807907104,
+                    1.0
+                ],
+                "specularStrength": 32.0
+            }
+        },
+        {
+            "name": "Emerald Red Rubber",
+            "shader": "Phong Lighting",
+            "textures": [
+                "Emerald"
+            ],
+            "properties": {
+                "emissive": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ambient": [
+                    0.05000000074505806,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "diffuse": [
+                    0.5,
+                    0.4000000059604645,
+                    0.4000000059604645,
+                    1.0
+                ],
+                "specular": [
+                    0.699999988079071,
+                    0.03999999910593033,
+                    0.03999999910593033,
+                    1.0
+                ],
+                "specularStrength": 10.0
+            }
+        },
+        {
+            "name": "Lit Thread",
+            "shader": "Phong Lighting",
+            "textures": [
+                "Thread"
+            ],
+            "properties": {
+                "emissive": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ambient": [
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    1.0
+                ],
+                "diffuse": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specular": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specularStrength": 128.0
+            }
+        },
+        {
+            "name": "Normal Color",
+            "shader": "Normal To Color",
+            "textures": [],
+            "properties": null
+        }
+    ],
+    "models": [
+        {
+            "name": "Car",
+            "path": "models/racing_car.obj",
+            "material": "Emerald Red Rubber"
+        },
+        {
+            "name": "Plane",
+            "path": "models/primitives/plane.obj",
+            "material": "Lit Thread"
+        },
+        {
+            "name": "Sphere",
+            "path": "models/primitives/sphere.obj",
+            "material": "Normal Color"
+        },
+        {
+            "name": "Teapot",
+            "path": "models/teapot2.obj",
+            "material": "Emerald Plastic"
+        }
+    ],
+    "nodes": [
+        {
+            "name": "teapot",
+            "type": "node",
+            "transform": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    1.5365039110183716,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "model": "Teapot",
+            "params": null,
+            "children": [
+                {
+                    "name": "car",
+                    "type": "node",
+                    "transform": {
+                        "position": [
+                            25.0,
+                            0.0,
+                            -4.0
+                        ],
+                        "rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "model": "Car",
+                    "params": null,
+                    "children": [
+                        {
+                            "name": "teapot2",
+                            "type": "node",
+                            "transform": {
+                                "position": [
+                                    30.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "scale": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "model": "Teapot",
+                            "params": null,
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "static light",
+            "type": "light",
+            "transform": {
+                "position": [
+                    -2.0,
+                    4.0,
+                    -1.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.30000001192092896,
+                    0.30000001192092896,
+                    0.30000001192092896
+                ]
+            },
+            "model": "Sphere",
+            "params": {
+                "color": [
+                    0.6784313917160034,
+                    0.847058892250061,
+                    0.9019608497619629,
+                    1.0
+                ],
+                "attenuation": [
+                    1.0,
+                    0.20000000298023224,
+                    0.10000000149011612
+                ],
+                "enabled": true
+            },
+            "children": []
+        },
+        {
+            "name": "ground",
+            "type": "node",
+            "transform": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    50.0,
+                    1.0,
+                    50.0
+                ]
+            },
+            "model": "Plane",
+            "params": null,
+            "children": []
+        },
+        {
+            "name": "main camera",
+            "type": "camera",
+            "transform": {
+                "position": [
+                    -7.269307613372803,
+                    5.439324378967285,
+                    -9.006970405578613
+                ],
+                "rotation": [
+                    -0.01650000549852848,
+                    1.8090001344680786,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "model": null,
+            "params": {
+                "fov": 0.7853981852531433
+            },
+            "children": [
+                {
+                    "name": "camera light",
+                    "type": "light",
+                    "transform": {
+                        "position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "model": null,
+                    "params": {
+                        "color": [
+                            0.9411765336990356,
+                            0.9725490808486938,
+                            1.0,
+                            1.0
+                        ],
+                        "attenuation": [
+                            1.0,
+                            0.20000000298023224,
+                            0.0
+                        ],
+                        "enabled": true
+                    },
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

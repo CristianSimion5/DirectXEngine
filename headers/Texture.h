@@ -9,14 +9,22 @@
 
 class Texture {
 public:
-    Texture(ID3D11Device*, ID3D11DeviceContext*, std::wstring, HWND);
+    Texture(std::string, ID3D11Device*, ID3D11DeviceContext*, std::string, HWND);
     ~Texture();
     
     void SetTexture(ID3D11DeviceContext*) const;
 
+public:
+    std::string name;
+
 private:
     ID3D11ShaderResourceView* m_TextureView;
     ID3D11SamplerState* m_SamplerState;
+
+    const std::string m_Path;
+
+    friend class Serializer;
+    friend class Deserializer;
 };
 
 #endif // !_TEXTURE_H_

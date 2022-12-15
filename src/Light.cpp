@@ -1,7 +1,7 @@
 #include "Light.h"
 
-Light::Light(Color color, Vector3 attenuationCoef, bool enabled, const SceneNode* parent, const Model* model)
-    : SceneNode(parent, model), m_Color(color), m_AttenuationCoef(attenuationCoef), m_Enabled(enabled) { }
+Light::Light(std::string _name, Color color, Vector3 attenuationCoef, bool enabled, const SceneNode* parent, const Model* model)
+    : SceneNode(_name, parent, model), m_Color(color), m_AttenuationCoef(attenuationCoef), m_Enabled(enabled) { }
 
 LightStruct Light::GetStruct() const {
     LightStruct lightStruct;
@@ -15,4 +15,8 @@ LightStruct Light::GetStruct() const {
 
 void Light::ToggleLight() {
     m_Enabled = !m_Enabled;
+}
+
+std::string Light::GetType() {
+    return "light";
 }

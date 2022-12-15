@@ -2,13 +2,21 @@
 
 #include "Helpers.h"
 
-Material::Material(Shader* shader): m_Shader(shader) {}
+Material::Material(std::string _name, Shader* shader): name(_name), m_Shader(shader) {}
 
 void Material::SetShader(ID3D11DeviceContext* deviceContext) {
     m_Shader->SetShader(deviceContext);
 }
 
-NormalAsColorMaterial::NormalAsColorMaterial(Shader* shader): Material(shader) {}
+const std::vector<const Texture*> Material::GetTextures() {
+    return {};
+}
+
+NormalAsColorMaterial::NormalAsColorMaterial(std::string _name, Shader* shader): Material(_name, shader) {}
+
+std::string NormalAsColorMaterial::GetType() {
+    return "normal-to-color";
+}
 
 bool NormalAsColorMaterial::SetShaderPerMeshData(ID3D11DeviceContext* deviceContext, ShaderPayload* shaderPayload) {
     return m_Shader->SetShaderParameters(deviceContext, shaderPayload);
@@ -19,8 +27,8 @@ bool NormalAsColorMaterial::SetShaderMaterialParameters(ID3D11DeviceContext* dev
 }
 
 
-PhongMaterial::PhongMaterial(ID3D11Device* device, Shader* shader, const Texture* texture, PhongMaterialProperties phongMaterial)
-    : Material(shader), m_Texture(texture), m_MaterialProperties(phongMaterial) {
+PhongMaterial::PhongMaterial(std::string _name, ID3D11Device* device, Shader* shader, const Texture* texture, PhongMaterialProperties phongMaterial)
+    : Material(_name, shader), m_Texture(texture), m_MaterialProperties(phongMaterial) {
     HRESULT result;
     D3D11_BUFFER_DESC constantBufferDesc;
     ZeroMemory(&constantBufferDesc, sizeof(D3D11_BUFFER_DESC));
@@ -41,6 +49,14 @@ PhongMaterial::~PhongMaterial() {
     if (m_MaterialConstantBuffer) {
         SafeRelease(m_MaterialConstantBuffer);
     }
+}
+
+const std::vector<const Texture*> PhongMaterial::GetTextures() {
+    return { m_Texture };
+}
+
+std::string PhongMaterial::GetType() {
+    return "phong-lighting";
 }
 
 bool PhongMaterial::SetShaderPerMeshData(ID3D11DeviceContext* deviceContext, ShaderPayload* shaderPayload) {

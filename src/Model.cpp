@@ -1,7 +1,9 @@
 #include "Model.hpp"
 
-bool Model::Initialize(ID3D11Device* device, const char* modelPath) {
+bool Model::Initialize(std::string _name, ID3D11Device* device, const char* modelPath) {
     bool result;
+    name = _name;
+    m_Path = modelPath;
     result = ImportModel(modelPath);
     if (!result) {
         return false;
@@ -17,8 +19,8 @@ bool Model::Initialize(ID3D11Device* device, const char* modelPath) {
     return true;
 }
 
-bool Model::Initialize(ID3D11Device* device, const char* modelPath, Material* material) {
-    bool result = Initialize(device, modelPath);
+bool Model::Initialize(std::string _name, ID3D11Device* device, const char* modelPath, Material* material) {
+    bool result = Initialize(_name, device, modelPath);
     if (!result) {
         return false;
     }

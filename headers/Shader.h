@@ -72,12 +72,14 @@ struct ShaderPayload {
 
 class Shader {
 public:
+	Shader(const std::string&, const std::string&, const std::string&);
 	virtual ~Shader() = default;
 
-	bool Initialize(ID3D11Device*, HWND, const std::wstring&, const std::wstring&);
+	bool Initialize(ID3D11Device*, HWND);
 	void Shutdown();
 	void SetShader(ID3D11DeviceContext*);
 
+	virtual std::string GetType() = 0;
 	virtual bool SetShaderParameters(ID3D11DeviceContext*, ShaderPayload*) = 0;
 
 protected:
@@ -89,14 +91,26 @@ protected:
 	virtual bool CreateConstantBuffers(ID3D11Device*) = 0;
 	virtual void ShutdownConstantBuffers() = 0;
 
+public:
+	std::string name;
+
 protected:
 	ID3D11VertexShader* m_VertexShader;
 	ID3D11PixelShader* m_PixelShader;
 	ID3D11InputLayout* m_Layout;
+
+	const std::string m_VsPath;
+	const std::string m_PsPath;
+
+	friend class Serializer;
+	friend class Deserializer;
 };
 
 class SimpleShader: public Shader {
 public:
+	using Shader::Shader;
+
+	virtual std::string GetType() override;
 	virtual bool SetShaderParameters(ID3D11DeviceContext*, ShaderPayload*) override;
 
 private:
@@ -106,10 +120,16 @@ private:
 
 private:
 	ID3D11Buffer* m_MatrixBuffer;
+
+	friend class Serializer;
+	friend class Deserializer;
 };
 
 class PhongShader : public Shader {
 public:
+	using Shader::Shader;
+
+	virtual std::string GetType() override;
 	virtual bool SetShaderParameters(ID3D11DeviceContext*, ShaderPayload*) override;
 
 private:
@@ -120,6 +140,9 @@ private:
 private:
 	ID3D11Buffer* m_PerObjectConstantBuffer;
 	ID3D11Buffer* m_LightPropertiesConstantBuffer;
+
+	friend class Serializer;
+	friend class Deserializer;
 };
 
 #endif // !_SHADER_H_

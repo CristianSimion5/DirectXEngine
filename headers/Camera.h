@@ -7,7 +7,7 @@
 
 class Camera : public SceneNode {
 public:
-    Camera(const SceneNode* = nullptr, const Model* = nullptr);
+    Camera(std::string _name, const SceneNode* = nullptr, const Model* = nullptr);
 
     void GenerateViewMatrix();
     void GenerateProjectionMatrices(int, int, float, float);
@@ -16,10 +16,17 @@ public:
     const Matrix& GetProjectionMatrix();
     const Matrix& GetOrthoMatrix();
 
+    virtual std::string GetType() override;
+
 private:
     Matrix m_ViewMatrix;
     Matrix m_ProjectionMatrix;
     Matrix m_OrthoMatrix;
+
+    float m_FieldOfView;
+
+    friend class Serializer;
+    friend class Deserializer;
 };
 
 #endif // !_CAMERA_H_

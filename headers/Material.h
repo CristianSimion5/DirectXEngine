@@ -9,24 +9,37 @@
 
 class Material {
 public:
-    Material(Shader*);
+    Material(std::string, Shader*);
     virtual ~Material() = default;
 
     void SetShader(ID3D11DeviceContext*);
 
+    virtual const std::vector<const Texture*> GetTextures();
+    
+    virtual std::string GetType() = 0;
     virtual bool SetShaderPerMeshData(ID3D11DeviceContext*, ShaderPayload*) = 0;
     virtual bool SetShaderMaterialParameters(ID3D11DeviceContext*, ShaderPayload*) = 0;
 
+public:
+    std::string name;
+
 protected:
     Shader* m_Shader;
+
+    friend class Serializer;
+    friend class Deserializer;
 };
 
 class NormalAsColorMaterial : public Material {
 public:
-    NormalAsColorMaterial(Shader*);
-
+    NormalAsColorMaterial(std::string, Shader*);
+    
+    virtual std::string GetType() override;
     virtual bool SetShaderPerMeshData(ID3D11DeviceContext*, ShaderPayload*) override;
     virtual bool SetShaderMaterialParameters(ID3D11DeviceContext*, ShaderPayload*) override;
+
+    friend class Serializer;
+    friend class Deserializer;
 };
 
 namespace PhongProperties {
@@ -53,9 +66,12 @@ namespace PhongProperties {
 
 class PhongMaterial: public Material {
 public:
-    PhongMaterial(ID3D11Device*, Shader*, const Texture*, PhongMaterialProperties);
+    PhongMaterial(std::string, ID3D11Device*, Shader*, const Texture*, PhongMaterialProperties);
     virtual ~PhongMaterial();
 
+    virtual const std::vector<const Texture*> GetTextures() override;
+
+    virtual std::string GetType() override;
     virtual bool SetShaderPerMeshData(ID3D11DeviceContext*, ShaderPayload*) override;
     virtual bool SetShaderMaterialParameters(ID3D11DeviceContext*, ShaderPayload*) override;
 
@@ -63,6 +79,9 @@ private:
     const Texture* m_Texture;
     PhongMaterialProperties m_MaterialProperties;
     ID3D11Buffer* m_MaterialConstantBuffer;
+
+    friend class Serializer;
+    friend class Deserializer;
 };
 
 #endif // !_MATERIAL_H_

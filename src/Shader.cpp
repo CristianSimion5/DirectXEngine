@@ -4,12 +4,15 @@
 
 #include <fstream>
 
-bool Shader::Initialize(ID3D11Device* device, HWND hWnd, const std::wstring& vsPath, const std::wstring& psPath) {
-    bool result;
-    LPCWSTR vsCompiledObjPath = vsPath.c_str();
-    LPCWSTR psCompiledObjPath = psPath.c_str();
+Shader::Shader(const std::string& _name, const std::string& vsPath, const std::string& psPath)
+    : name(_name), m_VsPath(vsPath), m_PsPath(psPath) {}
 
-    result = InitializeShader(device, hWnd, vsCompiledObjPath, psCompiledObjPath);
+bool Shader::Initialize(ID3D11Device* device, HWND hWnd) {
+    bool result;
+    std::wstring vsCompiledObjPath(m_VsPath.begin(), m_VsPath.end());
+    std::wstring psCompiledObjPath(m_PsPath.begin(), m_PsPath.end());
+
+    result = InitializeShader(device, hWnd, vsCompiledObjPath.c_str(), psCompiledObjPath.c_str());
     if (!result) {
         return false;
     }
@@ -121,6 +124,10 @@ void Shader::SetShader(ID3D11DeviceContext* deviceContext) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+std::string SimpleShader::GetType() {
+    return "normal-to-color";
+}
+
 bool SimpleShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, ShaderPayload* payload) {
     HRESULT result;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -186,6 +193,10 @@ void SimpleShader::ShutdownConstantBuffers() {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::string PhongShader::GetType() {
+    return "phong-lighting";
+}
 
 bool PhongShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, ShaderPayload* payload) {
     HRESULT result;

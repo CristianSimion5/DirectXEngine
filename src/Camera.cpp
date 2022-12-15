@@ -1,9 +1,10 @@
 #include "Camera.h"
 
-Camera::Camera(const SceneNode* parent, const Model* model)
-    : SceneNode(parent, model) {
+Camera::Camera(std::string _name, const SceneNode* parent, const Model* model)
+    : SceneNode(_name, parent, model) {
     transform.position = Vector3::Zero;
     transform.rotation = Vector3::Zero;
+    m_FieldOfView = DirectX::XM_PIDIV4;
 }
 
 const Matrix& Camera::GetViewMatrix() {
@@ -31,15 +32,17 @@ void Camera::GenerateViewMatrix() {
 }
 
 void Camera::GenerateProjectionMatrices(int screenWidth, int screenHeight, float screenDepth, float screenNear) {
-    float fieldOfView;
     float screenAspect;
 
-    fieldOfView = DirectX::XM_PIDIV4;
     screenAspect = 1.0f * screenWidth / screenHeight;
 
-    m_ProjectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect,
+    m_ProjectionMatrix = DirectX::XMMatrixPerspectiveFovLH(m_FieldOfView, screenAspect,
         screenNear, screenDepth);
 
     m_OrthoMatrix = DirectX::XMMatrixOrthographicLH(1.0f * screenWidth, 1.0f * screenHeight,
         screenNear, screenDepth);
+}
+
+std::string Camera::GetType() {
+    return "camera";
 }

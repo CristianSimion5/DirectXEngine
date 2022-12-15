@@ -3,13 +3,15 @@
 #include <WICTextureLoader.h>
 #include "Helpers.h"
 
-Texture::Texture(ID3D11Device* device, ID3D11DeviceContext* deviceContext, std::wstring filePath, HWND hWnd) {
+Texture::Texture(std::string _name, ID3D11Device* device, ID3D11DeviceContext* deviceContext, std::string filePath, HWND hWnd)
+    : name(_name), m_Path(filePath) {
     HRESULT result;
     m_TextureView = nullptr;
     m_SamplerState = nullptr;
 
+    std::wstring wPath(filePath.begin(), filePath.end());
     result = DirectX::CreateWICTextureFromFile(device, deviceContext, 
-        filePath.c_str(), nullptr, &m_TextureView, 0);
+        wPath.c_str(), nullptr, &m_TextureView, 0);
     if (FAILED(result)) {
         MessageBox(hWnd, TEXT("Failed to load texture."), TEXT("Error"), MB_OK);
         return;

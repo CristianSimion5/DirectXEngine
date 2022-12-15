@@ -1,9 +1,7 @@
 #include "SceneNode.h"
 
-SceneNode::SceneNode(const SceneNode* parent, const Model* model) {
-    m_Parent = parent;
-    m_Model = model;
-}
+SceneNode::SceneNode(std::string _name, const SceneNode* parent, const Model* model)
+    : name(_name), m_Parent(parent), m_Model(model) {}
 
 bool SceneNode::Render(ID3D11DeviceContext* deviceContext, ShaderPayload* shaderPayload) {
     bool renderSuccess;
@@ -39,4 +37,8 @@ void SceneNode::AddChild(std::unique_ptr<SceneNode>&& child) {
 
 void SceneNode::SetModel(const Model* model) {
     m_Model = model;
+}
+
+std::string SceneNode::GetType() {
+    return "node";
 }

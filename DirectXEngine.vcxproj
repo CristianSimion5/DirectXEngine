@@ -51,6 +51,8 @@
     <ClInclude Include="headers\Material.h" />
     <ClInclude Include="headers\Light.h" />
     <ClInclude Include="headers\Scene.h" />
+    <ClInclude Include="headers\Serializer.h" />
+    <ClInclude Include="headers\Deserializer.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\PhongPixelShader.hlsl">

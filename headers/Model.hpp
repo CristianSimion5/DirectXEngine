@@ -13,8 +13,8 @@
 
 class Model {
 public:
-    bool Initialize(ID3D11Device*, const char*);
-    bool Initialize(ID3D11Device*, const char*, Material*);
+    bool Initialize(std::string, ID3D11Device*, const char*);
+    bool Initialize(std::string, ID3D11Device*, const char*, Material*);
     void Shutdown();
 
     bool Render(ID3D11DeviceContext*, ShaderPayload*, Matrix) const;
@@ -25,9 +25,17 @@ private:
     void LoadNode(aiNode*, const aiScene*, aiMatrix4x4);
     void LoadMesh(aiMesh*, const aiScene*, aiMatrix4x4, aiMatrix4x4);
 
+public:
+    std::string name;
+
 private:
     std::vector<Mesh> m_Meshes;
     Material* m_Material;
+
+    std::string m_Path;
+
+    friend class Serializer;
+    friend class Deserializer;
 };
 
 #endif // !_MODEL_H_

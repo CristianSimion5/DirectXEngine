@@ -15,7 +15,7 @@ const float SCREEN_NEAR = 0.1f;
 
 class Scene {
 public:
-    Scene(ID3D11Device*, ID3D11DeviceContext*);
+    Scene(std::string, ID3D11Device*, ID3D11DeviceContext*);
     bool Initialize(int, int, HWND);
     void Shutdown();
 
@@ -33,6 +33,9 @@ private:
     bool InitializeModels();
     void InitializeScene(int, int);
 
+public:
+    std::string name;
+
 private:
     Camera* m_MainCamera;
     std::map<std::string, Light*> m_Lights;
@@ -47,6 +50,9 @@ private:
     HWND m_hWnd;
     ID3D11Device* m_Device;
     ID3D11DeviceContext* m_DeviceContext;
+
+    friend class Serializer;
+    friend class Deserializer;
 };
 
 #endif // !_SCENE_H_

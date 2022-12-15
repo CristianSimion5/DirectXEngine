@@ -23,7 +23,7 @@ bool GraphicsManager::Initialize(int screenWidth, int screenHeight, HWND hWnd) {
 	m_Mouse = std::make_unique<DirectX::Mouse>();
 	m_Mouse->SetWindow(m_hWnd);
 
-	m_Scene = std::make_unique<Scene>(m_d3d->GetDevice(), m_d3d->GetDeviceContext());
+	m_Scene = std::make_unique<Scene>("Sample scene", m_d3d->GetDevice(), m_d3d->GetDeviceContext());
 	if (!m_Scene->Initialize(screenWidth, screenHeight, hWnd)) {
 		return false;
 	}

@@ -12,7 +12,7 @@ using namespace DirectX::SimpleMath;
 
 class SceneNode {
 public:
-    SceneNode(const SceneNode* parent = nullptr, const Model* model = nullptr);
+    SceneNode(std::string _name, const SceneNode* parent = nullptr, const Model* model = nullptr);
     //virtual ~SceneNode() = default;
     bool Render(ID3D11DeviceContext*, ShaderPayload*);
     void UpdateTransform();
@@ -20,7 +20,10 @@ public:
 
     void SetModel(const Model*);
 
+    virtual std::string GetType();
+
 public:
+    std::string name;
     Transform transform;
     std::vector<std::unique_ptr<SceneNode>> children;
 
@@ -28,6 +31,9 @@ private:
     // Observing pointers
     const SceneNode* m_Parent;
     const Model* m_Model;
+
+    friend class Serializer;
+    friend class Deserializer;
 };
 
 #endif // !_SCENENODE_H_
