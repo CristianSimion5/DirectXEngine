@@ -25,6 +25,7 @@ public:
     void HandleResize(int, int);
     
     Camera* GetMainCamera();
+    const SceneNode* GetSceneRoot();
 
 private:
     bool InitializeShaders();
@@ -50,6 +51,8 @@ private:
     HWND m_hWnd;
     ID3D11Device* m_Device;
     ID3D11DeviceContext* m_DeviceContext;
+
+    int m_ScreenWidth, m_ScreenHeight;
 
     friend class Serializer;
     friend class Deserializer;

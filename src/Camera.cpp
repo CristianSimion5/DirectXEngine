@@ -19,6 +19,10 @@ const Matrix& Camera::GetOrthoMatrix() {
     return m_OrthoMatrix;
 }
 
+float Camera::GetFov() const {
+    return m_FieldOfView;
+}
+
 void Camera::GenerateViewMatrix() {
     Vector3 up = Vector3::Up;
     Vector3 lookAt = Vector3::Backward;

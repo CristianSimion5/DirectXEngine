@@ -16,6 +16,8 @@ public:
     const Matrix& GetProjectionMatrix();
     const Matrix& GetOrthoMatrix();
 
+    float GetFov() const;
+
     virtual std::string GetType() override;
 
 private:
@@ -27,6 +29,7 @@ private:
 
     friend class Serializer;
     friend class Deserializer;
+    friend class GuiManager;
 };
 
 #endif // !_CAMERA_H_

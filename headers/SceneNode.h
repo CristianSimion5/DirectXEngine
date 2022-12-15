@@ -10,11 +10,13 @@
 
 using namespace DirectX::SimpleMath;
 
+struct Frustum;
+
 class SceneNode {
 public:
     SceneNode(std::string _name, const SceneNode* parent = nullptr, const Model* model = nullptr);
     //virtual ~SceneNode() = default;
-    bool Render(ID3D11DeviceContext*, ShaderPayload*);
+    bool Render(ID3D11DeviceContext*, ShaderPayload*, Frustum* = nullptr);
     void UpdateTransform();
     void AddChild(std::unique_ptr<SceneNode>&& child);
 
@@ -34,6 +36,7 @@ private:
 
     friend class Serializer;
     friend class Deserializer;
+    friend class GuiManager;
 };
 
 #endif // !_SCENENODE_H_

@@ -22,6 +22,7 @@ private:
 
     friend class Serializer;
     friend class Deserializer;
+    friend class GuiManager;
 };
 
 #endif // !_LIGHT_H_

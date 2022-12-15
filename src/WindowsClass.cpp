@@ -3,6 +3,8 @@
 #include <iostream>
 #include <timeapi.h>
 
+#include <imgui/imgui_impl_win32.h>
+
 // DirectXTK input helper classes
 #include "Keyboard.h"
 #include "Mouse.h"
@@ -236,21 +238,41 @@ void WindowsClass::ShutdownWindows() {
     g_ApplicationHandle = nullptr;
 }
 
+// Forward declare message handler from imgui_impl_win32.cpp
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+// Win32 message handler
+// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
+// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
+// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
+// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam) {
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, uMessage, wParam, lParam))
+        return true;
+
     switch (uMessage) {
     case WM_DESTROY:
-    {
-        PostQuitMessage(0);
-        return 0;
-    }
+        {
+            PostQuitMessage(0);
+            return 0;
+        }
     case WM_CLOSE:
-    {
-        PostQuitMessage(0);
-        return 0;
-    }
+        {
+            PostQuitMessage(0);
+            return 0;
+        }
+    case WM_DPICHANGED:
+        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DpiEnableScaleViewports)
+        {
+            //const int dpi = HIWORD(wParam);
+            //printf("WM_DPICHANGED to %d (%.0f%%)\n", dpi, (float)dpi / 96.0f * 100.0f);
+            const RECT* suggested_rect = (RECT*)lParam;
+            SetWindowPos(hWnd, NULL, suggested_rect->left, suggested_rect->top, suggested_rect->right - suggested_rect->left, suggested_rect->bottom - suggested_rect->top, SWP_NOZORDER | SWP_NOACTIVATE);
+        }
+        //break;
     default:
-    {
-        return g_ApplicationHandle->MessageHandler(hWnd, uMessage, wParam, lParam);
-    }
+        {
+            return g_ApplicationHandle->MessageHandler(hWnd, uMessage, wParam, lParam);
+        }
     }
 }

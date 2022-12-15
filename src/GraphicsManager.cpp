@@ -19,6 +19,8 @@ bool GraphicsManager::Initialize(int screenWidth, int screenHeight, HWND hWnd) {
 		return false;
 	}
 
+	m_Gui = std::make_unique<GuiManager>(m_d3d->GetDevice(), m_d3d->GetDeviceContext(), m_hWnd);
+
 	m_Keyboard = std::make_unique<DirectX::Keyboard>();
 	m_Mouse = std::make_unique<DirectX::Mouse>();
 	m_Mouse->SetWindow(m_hWnd);
@@ -44,6 +46,8 @@ bool GraphicsManager::Frame(float deltaTime) {
 	bool result;
 
 	ProcessInput(deltaTime);
+	m_Scene->Update(deltaTime);
+	m_Gui->Update(m_Scene->GetSceneRoot());
 	result = Render(deltaTime);
 	if (!result) {
 		return false;
@@ -67,10 +71,10 @@ bool GraphicsManager::HandleResize(int screenWidth, int screenHeight) {
 bool GraphicsManager::Render(float deltaTime) {
 	m_d3d->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
-	m_Scene->Update(deltaTime);
 	if (!m_Scene->Render()) {
 		return false;
 	}
+	m_Gui->Render();
 
 	m_d3d->EndScene();
 

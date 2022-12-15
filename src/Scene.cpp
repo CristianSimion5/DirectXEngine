@@ -2,8 +2,9 @@
 
 #include "Serializer.h"
 #include "Deserializer.h"
+#include "FrustumCulling.h"
 
-#include "DirectXColors.h"
+#include <DirectXColors.h>
 
 Scene::Scene(std::string _name, ID3D11Device* device, ID3D11DeviceContext* deviceContext): name(_name), m_Device(device), m_DeviceContext(deviceContext),
 	m_MainCamera(nullptr), m_hWnd(nullptr) {}
@@ -11,6 +12,9 @@ Scene::Scene(std::string _name, ID3D11Device* device, ID3D11DeviceContext* devic
 bool Scene::Initialize(int screenWidth, int screenHeight, HWND hWnd) {
 	m_hWnd = hWnd;
 
+
+	m_ScreenWidth = screenWidth;
+	m_ScreenHeight = screenHeight;
 	Deserializer deser;
 	deser.DeserializeScene(this, "scene3.json");
 	m_MainCamera->GenerateProjectionMatrices(screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
@@ -231,7 +235,8 @@ void Scene::Update(float deltaTime) {
 }
 
 bool Scene::Render() {
-	if (!m_SceneRoot->Render(m_DeviceContext, &m_ShaderPayload)) {
+	Frustum camFrustum(*m_MainCamera, 1.0f * m_ScreenWidth / m_ScreenHeight, SCREEN_NEAR, SCREEN_DEPTH);
+	if (!m_SceneRoot->Render(m_DeviceContext, &m_ShaderPayload, &camFrustum)) {
 		return false;
 	}
 	return true;
@@ -239,8 +244,14 @@ bool Scene::Render() {
 
 void Scene::HandleResize(int screenWidth, int screenHeight) {
 	m_MainCamera->GenerateProjectionMatrices(screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
+	m_ScreenWidth = screenWidth;
+	m_ScreenHeight = screenHeight;
 }
 
 Camera* Scene::GetMainCamera() {
 	return m_MainCamera;
+}
+
+const SceneNode* Scene::GetSceneRoot() {
+	return m_SceneRoot.get();
 }

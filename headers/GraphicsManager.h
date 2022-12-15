@@ -11,6 +11,7 @@
 #include "Mouse.h"
 
 #include "D3D11Manager.h"
+#include "GuiManager.h"
 #include "Shader.h"
 #include "Model.hpp"
 #include "Texture.h"
@@ -49,7 +50,9 @@ private:
     HWND m_hWnd;
     std::unique_ptr<DirectX::Keyboard> m_Keyboard;
     std::unique_ptr<DirectX::Mouse> m_Mouse;
-    
+   
+    std::unique_ptr<GuiManager> m_Gui;
+
     std::unique_ptr<Scene> m_Scene;
 };
 
