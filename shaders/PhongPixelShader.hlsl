@@ -1,5 +1,10 @@
 Texture2D tex : register(t0);
+Texture2D normTex : register(t1);
+Texture2D heightTex : register(t2);
+
 sampler texSampler : register(s0);
+sampler normSampler : register(s1);
+sampler heightSampler : register(s2);
 
 struct Material
 {
@@ -14,6 +19,8 @@ struct Material
 cbuffer MaterialProperties : register(b0)
 {
     Material material;
+    bool useNormalMap;
+    bool useHeightMap;
 }
 
 struct Light
@@ -119,16 +126,72 @@ LightResult computeAllLights(float4 P, float3 N)
     return result;
 }
 
+float2 ParallaxMapping(float2 texCoords, float3 V)
+{
+    V.y = -V.y;
+    const float minLayers = 8;
+    const float maxLayers = 32;
+    float layers = lerp(maxLayers, minLayers, max(dot(float3(0.0f, 0.0f, 1.0f), V), 0.0f));
+    const float heightScale = 0.1f;
+    float layerSize = 1.0f / layers;
+    float currentLayerDepth = 0.0f;
+    
+    float2 P = V.xy * heightScale;
+    float2 deltaTexCoords = P * layerSize;
+    
+    float2 currentTexCoords     = texCoords;
+    float  currentDepthMapValue = 1.0f - heightTex.Sample(heightSampler, currentTexCoords).x;
+    
+    [loop]
+    while (currentLayerDepth < currentDepthMapValue)
+    {
+        currentTexCoords -= deltaTexCoords;
+        currentDepthMapValue = 1.0f - heightTex.Sample(heightSampler, currentTexCoords).x;
+        currentLayerDepth += layerSize;
+    }
+    
+    float2 prevTexCoords = currentTexCoords + deltaTexCoords;
+    
+    float afterDepth = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = 1.0f - heightTex.Sample(heightSampler, prevTexCoords).x - currentLayerDepth + layerSize;
+    
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    
+    return prevTexCoords * weight + currentTexCoords * (1.0f - weight);
+    //return currentTexCoords;
+    // float height = 1.0f - heightTex.Sample(heightSampler, texCoords).x;
+    //float2 P = V.xy / V.z * (height * 0.05);
+        //return texCoords - P;
+}
+
 struct PixelInputType
 {
     float4 positionWorld : TEXCOORD1;
     float3 normalWorld   : TEXCOORD2;
     float2 texCoord      : TEXCOORD0;
+    float3x3 tbn         : TEXCOORD3;
+    float3x3 invTbn      : COLOR; // World-to-tangent space
 };
 
 float4 main(PixelInputType input) : SV_TARGET
 {
-    LightResult lresult = computeAllLights(input.positionWorld, normalize(input.normalWorld));
+    if (useHeightMap)
+    {
+        float3 viewDirTangent = normalize(mul((eyePosition - input.positionWorld).xyz, input.invTbn));
+        input.texCoord = ParallaxMapping(input.texCoord, viewDirTangent);
+        if (input.texCoord.x > 1.0 || input.texCoord.y > 1.0 || 
+            input.texCoord.x < 0.0 || input.texCoord.y < 0.0)
+            discard;
+    }
+    
+    float3 inputNormal = input.normalWorld;
+    if (useNormalMap) 
+    {
+        inputNormal = normTex.Sample(texSampler, input.texCoord).xyz * 2.0f - 1.0f;
+        inputNormal = mul(inputNormal, input.tbn);
+    }
+    
+    LightResult lresult = computeAllLights(input.positionWorld, normalize(inputNormal));
     float4 emissive = material.emissive;
     float4 ambient = material.ambient * globalAmbient;
     float4 diffuse = material.diffuse * lresult.diffuse;
@@ -136,5 +199,5 @@ float4 main(PixelInputType input) : SV_TARGET
     
     float4 textureColor = tex.Sample(texSampler, input.texCoord);
     
-    return textureColor * (emissive + ambient + diffuse + specular);
+    return textureColor * (emissive + ambient + diffuse + specular) * 3.5;
 }

@@ -46,7 +46,7 @@ Texture::~Texture() {
     SafeRelease(m_TextureView);
 }
 
-void Texture::SetTexture(ID3D11DeviceContext* deviceContext) const {
-    deviceContext->PSSetSamplers(0, 1, &m_SamplerState);
-    deviceContext->PSSetShaderResources(0, 1, &m_TextureView);
+void Texture::SetTexture(ID3D11DeviceContext* deviceContext, UINT slot) const {
+    deviceContext->PSSetSamplers(slot, 1, &m_SamplerState);
+    deviceContext->PSSetShaderResources(slot, 1, &m_TextureView);
 }

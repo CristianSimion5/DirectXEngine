@@ -115,6 +115,14 @@ inline void Deserializer::DeserializeMaterial(const json& j, Scene* scene) {
             scene->m_Textures[j["textures"][0]].get(),
             properties
             );
+        if (j["textures"].size() >= 2) {
+            PhongMaterial* tempMat = dynamic_cast<PhongMaterial*>(material.get());
+            tempMat->SetNormalMap(scene->m_Textures[j["textures"][1]].get());
+        }
+        if (j["textures"].size() >= 3) {
+            PhongMaterial* tempMat = dynamic_cast<PhongMaterial*>(material.get());
+            tempMat->SetHeightMap(scene->m_Textures[j["textures"][2]].get());
+        }
     }
     
     scene->m_Materials.insert({ material->name, std::move(material) });

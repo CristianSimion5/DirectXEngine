@@ -70,13 +70,18 @@ public:
     virtual ~PhongMaterial();
 
     virtual const std::vector<const Texture*> GetTextures() override;
+    void SetNormalMap(const Texture* normalMap);
+    void SetHeightMap(const Texture* heightMap);
 
     virtual std::string GetType() override;
     virtual bool SetShaderPerMeshData(ID3D11DeviceContext*, ShaderPayload*) override;
     virtual bool SetShaderMaterialParameters(ID3D11DeviceContext*, ShaderPayload*) override;
 
 private:
-    const Texture* m_Texture;
+    const Texture* m_ColorMap;
+    const Texture* m_NormalMap;
+    const Texture* m_HeightMap;
+
     PhongMaterialProperties m_MaterialProperties;
     ID3D11Buffer* m_MaterialConstantBuffer;
 

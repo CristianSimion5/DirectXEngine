@@ -25,6 +25,42 @@
             "path": "textures/thread_texture.jpg"
         },
         {
+            "name": "Ground",
+            "path": "textures/Ground-Diffuse.jpg"
+        },
+        {
+            "name": "Ground Normal",
+            "path": "textures/Ground-Normal.jpg"
+        },
+        {
+            "name": "Ground Height",
+            "path": "textures/Ground-Height.jpg"
+        },
+        {
+            "name": "Bricks",
+            "path": "textures/bricks_diffuse.png"
+        },
+        {
+            "name": "Bricks Normal",
+            "path": "textures/bricks_normal.png"
+        },
+        {
+            "name": "Bricks Height",
+            "path": "textures/bricks_displacement.png"
+        },
+        {
+            "name": "Toy Box",
+            "path": "textures/wood.png"
+        },
+        {
+            "name": "Toy Box Normal",
+            "path": "textures/toy_box_normal.png"
+        },
+        {
+            "name": "Toy Box Height",
+            "path": "textures/toy_box_disp.png"
+        },
+        {
             "name": "Diamond",
             "path": "textures/diamond_texture.jpg"
         }
@@ -171,6 +207,117 @@
             }
         },
         {
+            "name": "Ground Material",
+            "type": "phong-lighting",
+            "shader": "Phong Lighting",
+            "textures": [
+                "Ground",
+                "Ground Normal",
+                "Ground Height"
+            ],
+            "properties": {
+                "emissive": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ambient": [
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    1.0
+                ],
+                "diffuse": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specular": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specularStrength": 128.0
+            }
+        },
+        {
+            "name": "Bricks Material",
+            "type": "phong-lighting",
+            "shader": "Phong Lighting",
+            "textures": [
+                "Bricks",
+                "Bricks Normal",
+                "Bricks Height"
+            ],
+            "properties": {
+                "emissive": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ambient": [
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    1.0
+                ],
+                "diffuse": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specular": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specularStrength": 128.0
+            }
+        },
+        {
+            "name": "Toy Box Material",
+            "type": "phong-lighting",
+            "shader": "Phong Lighting",
+            "textures": [
+                "Toy Box",
+                "Toy Box Normal",
+                "Toy Box Height"
+            ],
+            "properties": {
+                "emissive": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ambient": [
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    1.0
+                ],
+                "diffuse": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specular": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specularStrength": 128.0
+            }
+        },
+        {
             "name": "Normal Color",
             "type": "normal-to-color",
             "shader": "Normal To Color",
@@ -187,7 +334,12 @@
         {
             "name": "Plane",
             "path": "models/primitives/plane.obj",
-            "material": "Lit Thread"
+            "material": "Ground Material"
+        },
+        {
+            "name": "Wall",
+            "path": "models/primitives/plane.obj",
+            "material": "Bricks Material"
         },
         {
             "name": "Sphere",
@@ -342,6 +494,30 @@
             "children": []
         },
         {
+            "name": "ball",
+            "type": "node",
+            "transform": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "model": "Sphere",
+            "params": null,
+            "children": []
+        },
+        {
             "name": "ground",
             "type": "node",
             "transform": {
@@ -356,12 +532,36 @@
                     0.0
                 ],
                 "scale": [
-                    50.0,
+                    5.0,
                     1.0,
-                    50.0
+                    5.0
                 ]
             },
             "model": "Plane",
+            "params": null,
+            "children": []
+        },
+        {
+            "name": "wall",
+            "type": "node",
+            "transform": {
+                "position": [
+                    6.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    1.57,
+                    0.0,
+                    1.57
+                ],
+                "scale": [
+                    7.0,
+                    1.0,
+                    7.0
+                ]
+            },
+            "model": "Wall",
             "params": null,
             "children": []
         },

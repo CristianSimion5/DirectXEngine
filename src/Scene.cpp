@@ -3,6 +3,7 @@
 #include "Serializer.h"
 #include "Deserializer.h"
 #include "FrustumCulling.h"
+#include "ScriptingManager.h"
 
 #include <DirectXColors.h>
 
@@ -16,7 +17,7 @@ bool Scene::Initialize(int screenWidth, int screenHeight, HWND hWnd) {
 	m_ScreenWidth = screenWidth;
 	m_ScreenHeight = screenHeight;
 	Deserializer deser;
-	deser.DeserializeScene(this, "scenes/scene3.json");
+	deser.DeserializeScene(this, "scenes/scene4.json");
 	m_MainCamera->GenerateProjectionMatrices(screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
 
 	/*if (!InitializeShaders()) {
@@ -202,13 +203,13 @@ void Scene::Shutdown() {
 	}
 }
 
-void Scene::Update(float deltaTime) {
+void Scene::Update(float deltaTime, ScriptingManager* scripting) {
 	//m_MainCamera->Render(deltaTime);
 	m_MainCamera->GenerateViewMatrix();
 	m_MainCamera->UpdateTransform();
 
 	//m_Models[1]->transform.position += Vector3(-25.0f, 0.0f, 4.0f);
-	m_SceneRoot->children[0]->children[0]->children[0]->transform.rotation += Vector3::Up * DirectX::XMConvertToRadians(30.0f) * deltaTime;
+	//m_SceneRoot->children[0]->children[0]->children[0]->transform.rotation += Vector3::Up * DirectX::XMConvertToRadians(30.0f) * deltaTime;
 	//m_SceneRoot->children[0]->children[0]->children[0]->UpdateTransform();
 	m_SceneRoot->children[0]->children[0]->transform.rotation += Vector3::Up * DirectX::XMConvertToRadians(15.0f) * deltaTime;
 	//m_SceneRoot->children[0]->children[0]->UpdateTransform();
@@ -216,6 +217,7 @@ void Scene::Update(float deltaTime) {
 	m_SceneRoot->children[0]->transform.rotation += Vector3::Up * DirectX::XMConvertToRadians(15.0f) * deltaTime;
 	//m_SceneRoot->children[0]->transform.scale = Vector3::One * 0.1f;
 	//m_SceneRoot->children[0]->UpdateTransform();
+	m_SceneRoot->Update(deltaTime, scripting);
 	m_SceneRoot->UpdateTransform();
 
 	m_ShaderPayload.matrices.view = m_MainCamera->GetViewMatrix();

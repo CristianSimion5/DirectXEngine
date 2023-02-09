@@ -11,6 +11,8 @@
 struct Vertex {
     Vector3 Position;
     Vector3 Normal;
+    Vector3 Tangent;
+    Vector3 Bitangent;
     Vector2 UV;
 };
 
@@ -23,6 +25,7 @@ public:
     void BindBuffers(ID3D11DeviceContext*) const;
 
     int GetIndexCount() const;
+    const std::vector<Vertex>& GetVertices() const;
 
 private:
     bool InitializeBuffers(ID3D11Device*);

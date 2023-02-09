@@ -13,13 +13,15 @@
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
 
+class ScriptingManager;
+
 class Scene {
 public:
     Scene(std::string, ID3D11Device*, ID3D11DeviceContext*);
     bool Initialize(int, int, HWND);
     void Shutdown();
 
-    void Update(float);
+    void Update(float, ScriptingManager*);
     bool Render();
     
     void HandleResize(int, int);

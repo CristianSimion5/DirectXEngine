@@ -28,7 +28,7 @@ bool NormalAsColorMaterial::SetShaderMaterialParameters(ID3D11DeviceContext* dev
 
 
 PhongMaterial::PhongMaterial(std::string _name, ID3D11Device* device, Shader* shader, const Texture* texture, PhongMaterialProperties phongMaterial)
-    : Material(_name, shader), m_Texture(texture), m_MaterialProperties(phongMaterial) {
+    : Material(_name, shader), m_ColorMap(texture), m_MaterialProperties(phongMaterial) {
     HRESULT result;
     D3D11_BUFFER_DESC constantBufferDesc;
     ZeroMemory(&constantBufferDesc, sizeof(D3D11_BUFFER_DESC));
@@ -52,7 +52,15 @@ PhongMaterial::~PhongMaterial() {
 }
 
 const std::vector<const Texture*> PhongMaterial::GetTextures() {
-    return { m_Texture };
+    return { m_ColorMap, m_NormalMap };
+}
+
+void PhongMaterial::SetNormalMap(const Texture* normalMap) {
+    m_NormalMap = normalMap;
+}
+
+void PhongMaterial::SetHeightMap(const Texture* heightMap) {
+    m_HeightMap = heightMap;
 }
 
 std::string PhongMaterial::GetType() {
@@ -82,11 +90,22 @@ bool PhongMaterial::SetShaderMaterialParameters(ID3D11DeviceContext* deviceConte
     dataPtr->diffuse          = shaderPayload->phongMaterial.diffuse;
     dataPtr->specular         = shaderPayload->phongMaterial.specular;
     dataPtr->specularStrength = shaderPayload->phongMaterial.specularStrength;
+    if (m_NormalMap != nullptr) {
+        dataPtr->useNormalMap = true;
+        m_NormalMap->SetTexture(deviceContext, 1);
+    } else {
+        dataPtr->useNormalMap = false;
+    }
+    if (m_HeightMap != nullptr) {
+        dataPtr->useHeightMap = true;
+        m_HeightMap->SetTexture(deviceContext, 2);
+    } else {
+        dataPtr->useHeightMap = false;
+    }
 
     deviceContext->Unmap(m_MaterialConstantBuffer, 0);
 
     deviceContext->PSSetConstantBuffers(0, 1, &m_MaterialConstantBuffer);
-    m_Texture->SetTexture(deviceContext);
-
+    m_ColorMap->SetTexture(deviceContext, 0);
     return true;
 }

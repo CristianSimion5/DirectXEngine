@@ -10,11 +10,13 @@
 
 #include "Mesh.h"
 #include "Material.h"
+#include "FrustumCulling.h"
 
 class Model {
 public:
     bool Initialize(std::string, ID3D11Device*, const char*);
     bool Initialize(std::string, ID3D11Device*, const char*, Material*);
+    void InitializeBoundingSphere();
     void Shutdown();
 
     bool Render(ID3D11DeviceContext*, ShaderPayload*, Matrix) const;
@@ -27,6 +29,7 @@ private:
 
 public:
     std::string name;
+    BoundingSphere boundingSphere;
 
 private:
     std::vector<Mesh> m_Meshes;

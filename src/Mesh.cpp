@@ -27,6 +27,10 @@ int Mesh::GetIndexCount() const {
     return static_cast<int>(m_Indices.size());
 }
 
+const std::vector<Vertex>& Mesh::GetVertices() const {
+    return m_Vertices;
+}
+
 bool Mesh::InitializeBuffers(ID3D11Device* device) {
     D3D11_BUFFER_DESC vertexBufferDesc;
     D3D11_BUFFER_DESC indexBufferDesc;

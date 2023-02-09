@@ -16,6 +16,8 @@ bool Model::Initialize(std::string _name, ID3D11Device* device, const char* mode
         }
     }
 
+    InitializeBoundingSphere();
+
     return true;
 }
 
@@ -28,6 +30,25 @@ bool Model::Initialize(std::string _name, ID3D11Device* device, const char* mode
     m_Material = material;
 
     return true;
+}
+
+void Model::InitializeBoundingSphere() {
+    Vector3 minCoords(1e9f), maxCoords(-1e9f);
+    for (const Mesh& mesh : m_Meshes) {
+        for (const Vertex& vertex : mesh.GetVertices()) {
+            minCoords = Vector3::Min(minCoords, vertex.Position);
+            maxCoords = Vector3::Max(maxCoords, vertex.Position);
+        }
+    }
+    //float radius = Vector3::Distance(maxCoords, minCoords) * 0.5f;
+    Vector3 center = (minCoords + maxCoords) * 0.5f;
+    float radius = 0.0f;
+    for (const Mesh& mesh : m_Meshes) {
+        for (const Vertex& vertex : mesh.GetVertices()) {
+            radius = std::max(radius, Vector3::Distance(center, vertex.Position));
+        }
+    }
+    boundingSphere = BoundingSphere(center, radius);
 }
 
 void Model::Shutdown() {
@@ -79,7 +100,7 @@ void Model::SetMaterial(Material* material) {
 bool Model::ImportModel(const char* modelPath) {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(modelPath, 
-        aiProcess_ConvertToLeftHanded | aiProcess_GenSmoothNormals | aiProcess_Triangulate);
+        aiProcess_ConvertToLeftHanded | aiProcess_GenSmoothNormals | aiProcess_Triangulate | aiProcess_CalcTangentSpace);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         return false;
@@ -123,6 +144,14 @@ void Model::LoadMesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x4 parentTrans
         } else {
             vertex.UV = { 0.0f, 0.0f };
         }
+        if (mesh->HasTangentsAndBitangents()) {
+            vertex.Tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+            vertex.Bitangent = { mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z };
+        } else {
+            vertex.Tangent = { 0.0f, 0.0f, 0.0f };
+            vertex.Bitangent = { 0.0f, 0.0f, 0.0f };
+        }
+        
 
         vertices.push_back(vertex);
     }

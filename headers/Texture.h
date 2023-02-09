@@ -12,7 +12,7 @@ public:
     Texture(std::string, ID3D11Device*, ID3D11DeviceContext*, std::string, HWND);
     ~Texture();
     
-    void SetTexture(ID3D11DeviceContext*) const;
+    void SetTexture(ID3D11DeviceContext*, UINT slot = 0) const;
 
 public:
     std::string name;

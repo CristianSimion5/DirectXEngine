@@ -19,7 +19,9 @@ bool GraphicsManager::Initialize(int screenWidth, int screenHeight, HWND hWnd) {
 		return false;
 	}
 
+	m_Physics = std::make_unique<PhysicsManager>();
 	m_Gui = std::make_unique<GuiManager>(m_d3d->GetDevice(), m_d3d->GetDeviceContext(), m_hWnd);
+	m_Scripting = std::make_unique<ScriptingManager>();
 
 	m_Keyboard = std::make_unique<DirectX::Keyboard>();
 	m_Mouse = std::make_unique<DirectX::Mouse>();
@@ -46,8 +48,9 @@ bool GraphicsManager::Frame(float deltaTime) {
 	bool result;
 
 	ProcessInput(deltaTime);
-	m_Scene->Update(deltaTime);
-	m_Gui->Update(m_Scene->GetSceneRoot());
+	m_Scene->Update(deltaTime, m_Scripting.get());
+	m_Physics->Update(m_Scene.get());
+	m_Gui->Update(m_Scene->GetSceneRoot(), m_Physics.get());
 	result = Render(deltaTime);
 	if (!result) {
 		return false;

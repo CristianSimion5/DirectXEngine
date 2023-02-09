@@ -71,7 +71,7 @@ public:
         ImGui::DestroyContext();
     }
 
-    void Update(const SceneNode* node) {
+    void Update(const SceneNode* node, const PhysicsManager* physMgr) {
         // Start the Dear ImGui frame
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
@@ -120,6 +120,7 @@ public:
                 ImGui::End();
                 return;
             }
+
             ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
             //ImGui::BeginChild("split", ImVec2(150, 0), true);//ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable))
@@ -142,6 +143,23 @@ public:
             ImGui::End();
         }
 
+        {
+            if (!ImGui::Begin("Collisions list", &collision_pane)) {
+                ImGui::End();
+                return;
+            }
+            //ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+            //ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+
+            ImGui::Text("Collisions:");
+            for (auto& collisionPair : physMgr->collisions) {
+                ImGui::BulletText((collisionPair.first + " - " + collisionPair.second).c_str());
+                ImGui::Separator();
+            }
+
+            ImGui::End();
+        }
+
         if (selectedNode) {
             if (!ImGui::Begin("Node Properties", &node_pane)) {
                 ImGui::End();
@@ -154,18 +172,18 @@ public:
             if (ImGui::InputFloat3("Position", v)) {
                 selectedNode->transform.position = Vector3(v[0], v[1], v[2]);
             }
-
+          
             v[0] = selectedNode->transform.rotation.x;
             v[1] = selectedNode->transform.rotation.y;
             v[2] = selectedNode->transform.rotation.z;
-            if (ImGui::InputFloat3("Rotation", v)) {
+            if (ImGui::SliderFloat3("Rotation", v, 0.f, DirectX::XM_2PI)) {
                 selectedNode->transform.rotation = Vector3(v[0], v[1], v[2]);
             }
 
             v[0] = selectedNode->transform.scale.x;
             v[1] = selectedNode->transform.scale.y;
             v[2] = selectedNode->transform.scale.z;
-            if (ImGui::InputFloat3("Scale", v)) {
+            if (ImGui::SliderFloat3("Scale", v, 0.f, 10.f)) {
                 selectedNode->transform.scale = Vector3(v[0], v[1], v[2]);
             }
 
@@ -202,9 +220,11 @@ public:
                 ImGui::Text("Model: %s", selectedNode->m_Model->name.c_str());
             else
                 ImGui::Text("No model");
+            
+            if (ImGui::Button("Trigger Script"))
+                selectedNode->moving = !selectedNode->moving;
+
             ImGui::End();
-
-
         }
     }
 
@@ -218,7 +238,14 @@ public:
         if (node->children.size() == 0) {
             localFlags |= ImGuiTreeNodeFlags_Leaf;
         }
+        
+        if (node->culled)
+            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+        else
+            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32_WHITE);
+
         bool node_open = ImGui::TreeNodeEx("Node", localFlags, "%s", node->name.c_str());
+        ImGui::PopStyleColor();
 
         if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
             selectedNode = node;
@@ -261,6 +288,7 @@ public:
 private:
     bool hierarchy_pane = true;
     bool node_pane = true;
+    bool collision_pane = true;
     SceneNode* selectedNode;
 };
 

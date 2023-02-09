@@ -170,6 +170,12 @@
     <ClInclude Include="headers\FrustumCulling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\PhysicsManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\ScriptingManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\PixelShader.hlsl" />
@@ -179,5 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="scripts\script.lua" />
+    <None Include="scripts\move_cycle.lua" />
   </ItemGroup>
 </Project>

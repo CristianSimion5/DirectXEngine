@@ -11,7 +11,9 @@
 #include "Mouse.h"
 
 #include "D3D11Manager.h"
+#include "PhysicsManager.h"
 #include "GuiManager.h"
+#include "ScriptingManager.h"
 #include "Shader.h"
 #include "Model.hpp"
 #include "Texture.h"
@@ -46,7 +48,9 @@ private:
     const float LOOK_SPEED = 1.5f;
 
     std::unique_ptr<D3D11Manager> m_d3d;
-   
+    std::unique_ptr<PhysicsManager> m_Physics;
+    std::unique_ptr<ScriptingManager> m_Scripting;
+
     HWND m_hWnd;
     std::unique_ptr<DirectX::Keyboard> m_Keyboard;
     std::unique_ptr<DirectX::Mouse> m_Mouse;

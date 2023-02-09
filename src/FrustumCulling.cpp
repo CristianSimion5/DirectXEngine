@@ -1,5 +1,8 @@
 #include "FrustumCulling.h"
 
+#include "Camera.h"
+
+
 Frustum::Frustum(Camera& camera, float aspectRatio, float zNear, float zFar) {
     const float halfVertical = zFar * tanf(camera.GetFov() * 0.5f);
     const float halfHorizontal = halfVertical * aspectRatio;
@@ -36,9 +39,10 @@ Frustum::Frustum(Camera& camera, float aspectRatio, float zNear, float zFar) {
     bottom = Plane(camPosition, -cross);
 }
 
+BoundingSphere::BoundingSphere() : center(Vector3::Zero), radius(0.f) {}
 BoundingSphere::BoundingSphere(Vector3 _center, float _radius) : center(_center), radius(_radius) {}
 
-bool BoundingSphere::IsOnFrustum(const Frustum& camFrustum, Matrix& globalMatrix) {
+bool BoundingSphere::IsOnFrustum(const Frustum& camFrustum, Matrix& globalMatrix) const {
     Vector3 scale, _pos;
     Quaternion _quat;
     globalMatrix.Decompose(scale, _quat, _pos);

@@ -1,0 +1,608 @@
+{
+    "name": "Sample scene",
+    "main_camera": "main camera",
+    "shaders": [
+        {
+            "name": "Normal To Color",
+            "vs_path": "bin/shaders/VertexShader.cso",
+            "ps_path": "bin/shaders/PixelShader.cso",
+            "type": "normal-to-color"
+        },
+        {
+            "name": "Phong Lighting",
+            "vs_path": "bin/shaders/PhongVertexShader.cso",
+            "ps_path": "bin/shaders/PhongPixelShader.cso",
+            "type": "phong-lighting"
+        }
+    ],
+    "textures": [
+        {
+            "name": "Emerald",
+            "path": "textures/emerald_texture.jpg"
+        },
+        {
+            "name": "Thread",
+            "path": "textures/thread_texture.jpg"
+        },
+        {
+            "name": "Ground",
+            "path": "textures/Ground-Diffuse.jpg"
+        },
+        {
+            "name": "Ground Normal",
+            "path": "textures/Ground-Normal.jpg"
+        },
+        {
+            "name": "Ground Height",
+            "path": "textures/Ground-Height.jpg"
+        },
+        {
+            "name": "Bricks",
+            "path": "textures/bricks_diffuse.png"
+        },
+        {
+            "name": "Bricks Normal",
+            "path": "textures/bricks_normal.png"
+        },
+        {
+            "name": "Bricks Height",
+            "path": "textures/bricks_displacement.png"
+        },
+        {
+            "name": "Toy Box",
+            "path": "textures/wood.png"
+        },
+        {
+            "name": "Toy Box Normal",
+            "path": "textures/toy_box_normal.png"
+        },
+        {
+            "name": "Toy Box Height",
+            "path": "textures/toy_box_disp.png"
+        },
+        {
+            "name": "Diamond",
+            "path": "textures/diamond_texture.jpg"
+        }
+    ],
+    "materials": [
+        {
+            "name": "Pearl Diamond",
+            "type": "phong-lighting",
+            "shader": "Phong Lighting",
+            "textures": [
+                "Diamond"
+            ],
+            "properties": {
+                "emissive": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ambient": [
+                    0.25,
+                    0.20725,
+                    0.20725,
+                    1.0
+                ],
+                "diffuse": [
+                    1.0,
+                    0.829,
+                    0.829,
+                    1.0
+                ],
+                "specular": [
+                    0.296648,
+                    0.296648,
+                    0.296648,
+                    1.0
+                ],
+                "specularStrength": 11.264
+            }
+        },
+        {
+            "name": "Emerald Plastic",
+            "type": "phong-lighting",
+            "shader": "Phong Lighting",
+            "textures": [
+                "Emerald"
+            ],
+            "properties": {
+                "emissive": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ambient": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "diffuse": [
+                    0.10000000149011612,
+                    0.3499999940395355,
+                    0.10000000149011612,
+                    1.0
+                ],
+                "specular": [
+                    0.44999998807907104,
+                    0.550000011920929,
+                    0.44999998807907104,
+                    1.0
+                ],
+                "specularStrength": 32.0
+            }
+        },
+        {
+            "name": "Emerald Red Rubber",
+            "type": "phong-lighting",
+            "shader": "Phong Lighting",
+            "textures": [
+                "Emerald"
+            ],
+            "properties": {
+                "emissive": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ambient": [
+                    0.05000000074505806,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "diffuse": [
+                    0.5,
+                    0.4000000059604645,
+                    0.4000000059604645,
+                    1.0
+                ],
+                "specular": [
+                    0.699999988079071,
+                    0.03999999910593033,
+                    0.03999999910593033,
+                    1.0
+                ],
+                "specularStrength": 10.0
+            }
+        },
+        {
+            "name": "Lit Thread",
+            "type": "phong-lighting",
+            "shader": "Phong Lighting",
+            "textures": [
+                "Thread"
+            ],
+            "properties": {
+                "emissive": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ambient": [
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    1.0
+                ],
+                "diffuse": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specular": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specularStrength": 128.0
+            }
+        },
+        {
+            "name": "Ground Material",
+            "type": "phong-lighting",
+            "shader": "Phong Lighting",
+            "textures": [
+                "Ground",
+                "Ground Normal",
+                "Ground Height"
+            ],
+            "properties": {
+                "emissive": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ambient": [
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    1.0
+                ],
+                "diffuse": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specular": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specularStrength": 128.0
+            }
+        },
+        {
+            "name": "Bricks Material",
+            "type": "phong-lighting",
+            "shader": "Phong Lighting",
+            "textures": [
+                "Bricks",
+                "Bricks Normal",
+                "Bricks Height"
+            ],
+            "properties": {
+                "emissive": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ambient": [
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    1.0
+                ],
+                "diffuse": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specular": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specularStrength": 128.0
+            }
+        },
+        {
+            "name": "Toy Box Material",
+            "type": "phong-lighting",
+            "shader": "Phong Lighting",
+            "textures": [
+                "Toy Box",
+                "Toy Box Normal",
+                "Toy Box Height"
+            ],
+            "properties": {
+                "emissive": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ambient": [
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    1.0
+                ],
+                "diffuse": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specular": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specularStrength": 128.0
+            }
+        },
+        {
+            "name": "Normal Color",
+            "type": "normal-to-color",
+            "shader": "Normal To Color",
+            "textures": [],
+            "properties": null
+        }
+    ],
+    "models": [
+        {
+            "name": "Car",
+            "path": "models/racing_car.obj",
+            "material": "Emerald Red Rubber"
+        },
+        {
+            "name": "Plane",
+            "path": "models/primitives/plane.obj",
+            "material": "Ground Material"
+        },
+        {
+            "name": "Wall",
+            "path": "models/primitives/plane.obj",
+            "material": "Bricks Material"
+        },
+        {
+            "name": "Sphere",
+            "path": "models/primitives/sphere.obj",
+            "material": "Normal Color"
+        },
+        {
+            "name": "Cube",
+            "path": "models/primitives/cube.obj",
+            "material": "Pearl Diamond"
+        },
+        {
+            "name": "Teapot",
+            "path": "models/teapot2.obj",
+            "material": "Emerald Plastic"
+        }
+    ],
+    "nodes": [
+        {
+            "name": "teapot",
+            "type": "node",
+            "transform": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    4.359958648681641,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "model": "Teapot",
+            "params": null,
+            "children": [
+                {
+                    "name": "teapot2",
+                    "type": "node",
+                    "transform": {
+                        "position": [
+                            30.0,
+                            0.0,
+                            0.0
+                        ],
+                        "rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "model": "Teapot",
+                    "params": null,
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "diamond",
+            "type": "node",
+            "transform": {
+                "position": [
+                    0.0,
+                    10.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    2.0,
+                    2.0,
+                    2.0
+                ]
+            },
+            "model": "Cube",
+            "params": null,
+            "children": []
+        },
+        {
+            "name": "static light",
+            "type": "light",
+            "transform": {
+                "position": [
+                    -2.0,
+                    4.0,
+                    -1.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.30000001192092896,
+                    0.30000001192092896,
+                    0.30000001192092896
+                ]
+            },
+            "model": "Sphere",
+            "params": {
+                "color": [
+                    0.6784313917160034,
+                    0.847058892250061,
+                    0.9019608497619629,
+                    1.0
+                ],
+                "attenuation": [
+                    1.0,
+                    0.20000000298023224,
+                    0.10000000149011612
+                ],
+                "enabled": true
+            },
+            "children": []
+        },
+        {
+            "name": "ball",
+            "type": "node",
+            "transform": {
+                "position": [
+                    -2.0,
+                    4.0,
+                    -1.82
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "model": "Sphere",
+            "params": null,
+            "children": []
+        },
+        {
+            "name": "ground",
+            "type": "node",
+            "transform": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    5.0,
+                    1.0,
+                    5.0
+                ]
+            },
+            "model": "Plane",
+            "params": null,
+            "children": []
+        },
+        {
+            "name": "wall",
+            "type": "node",
+            "transform": {
+                "position": [
+                    6.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    1.57,
+                    0.0,
+                    1.57
+                ],
+                "scale": [
+                    7.0,
+                    1.0,
+                    7.0
+                ]
+            },
+            "model": "Wall",
+            "params": null,
+            "children": []
+        },
+        {
+            "name": "main camera",
+            "type": "camera",
+            "transform": {
+                "position": [
+                    -37.78145217895508,
+                    14.572822570800781,
+                    -1.5209259986877441
+                ],
+                "rotation": [
+                    0.19350004196166992,
+                    1.5945000648498535,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "model": null,
+            "params": {
+                "fov": 0.7853981852531433
+            },
+            "children": [
+                {
+                    "name": "camera light",
+                    "type": "light",
+                    "transform": {
+                        "position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "model": null,
+                    "params": {
+                        "color": [
+                            0.9411765336990356,
+                            0.9725490808486938,
+                            1.0,
+                            1.0
+                        ],
+                        "attenuation": [
+                            1.0,
+                            0.20000000298023224,
+                            0.0
+                        ],
+                        "enabled": true
+                    },
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

@@ -3,9 +3,9 @@
 
 #include <SimpleMath.h>
 
-#include "Camera.h"
-
 using namespace DirectX::SimpleMath;
+
+class Camera;
 
 struct Frustum {
     Frustum(Camera& camera, float aspectRatio, float zNear, float zFar);
@@ -19,8 +19,9 @@ struct Frustum {
 };
 
 struct BoundingSphere {
+    BoundingSphere();
     BoundingSphere(Vector3 _center, float _radius);
-    bool IsOnFrustum(const Frustum& camFrustum, Matrix& globalMatrix);
+    bool IsOnFrustum(const Frustum& camFrustum, Matrix& globalMatrix) const;
     bool IsOnForwardPlane(const Plane& camPlane);
 
     Vector3 center;

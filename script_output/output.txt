@@ -1,0 +1,3 @@
+script.lua loaded
+empty function
+12

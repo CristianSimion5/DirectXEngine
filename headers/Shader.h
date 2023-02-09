@@ -24,7 +24,7 @@ struct LightingMatrices {
 	Matrix worldViewProjectionMatrix;
 };
 
-struct PhongMaterialProperties {
+struct PhongMaterialProperties  {
 	// Emissive not usually used, make emissive component last
 	PhongMaterialProperties(
 		Vector4 a = Vector4(0.1f, 0.1f, 0.1f, 1.0f),
@@ -42,7 +42,11 @@ struct PhongMaterialProperties {
 	Vector4 diffuse;
 	Vector4 specular;
 	float specularStrength;
-	Vector3 PADDING;
+	bool useNormalMap = false;
+	bool PADDING[3];
+	bool useHeightMap = false;
+	float PADDING2;
+	//Vector2 PADDING;
 };
 
 struct LightStruct {

@@ -153,7 +153,7 @@ bool D3D11Manager::CreateSwapChainAndDevice(int screenWidth, int screenHeight, H
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
 
-	swapChainDesc.BufferCount = 1;
+	swapChainDesc.BufferCount = 2;
 	swapChainDesc.BufferDesc.Width = screenWidth;
 	swapChainDesc.BufferDesc.Height = screenHeight;
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -175,7 +175,7 @@ bool D3D11Manager::CreateSwapChainAndDevice(int screenWidth, int screenHeight, H
 	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapChainDesc.Flags = 0;
 
 	createDeviceFlags = 0;
@@ -354,6 +354,9 @@ void D3D11Manager::Shutdown() {
 
 void D3D11Manager::BeginScene(float red, float green, float blue, float alpha) {
 	float color[4] = { red, green, blue, alpha };
+	
+	// DXGI_SWAP_EFFECT_FLIP_* modes require re-binding the back buffers after each call
+	m_DeviceContext->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
 	
 	m_DeviceContext->ClearRenderTargetView(m_RenderTargetView, color);
 	m_DeviceContext->ClearDepthStencilView(m_DepthStencilView, 

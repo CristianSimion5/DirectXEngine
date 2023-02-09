@@ -93,7 +93,8 @@ inline nlohmann::ordered_json Serializer::SerializeMaterial(std::string name, Ma
     j["shader"] = material->m_Shader->name;
     j["textures"] = json::array();
     for (auto texture : material->GetTextures()) {
-        j["textures"].push_back(texture->name);
+        if (texture != nullptr)
+            j["textures"].push_back(texture->name);
     }
     if (material->GetType() == "phong-lighting") {
         PhongMaterial* pmat = dynamic_cast<PhongMaterial*>(material);
